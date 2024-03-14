@@ -14,9 +14,6 @@ RUN apt-get update && apt-get install -y fish
 # Install Python, Go, and other dependencies
 RUN apt-get install -y python3-pip golang
 
-# Install Starship prompt for fish
-RUN curl -sS https://starship.rs/install.sh | sh -s -- -y
-
 # # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_21.x | sudo -E bash - &&\
 sudo apt-get install -y nodejs
@@ -39,10 +36,19 @@ RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 # Set the default shell to Fish
 ENV SHELL=/usr/bin/fish
 
+# As a non-privileged user
 USER vscode
-SHELL ["/usr/bin/fish", "-c"] 
+
+# Running everything under fish
+SHELL ["/usr/bin/fish", "-c"]
+
+# Install Starship prompt for fish
+RUN curl -sS https://starship.rs/install.sh | sh -s -- -y
+
+# Installing foundry and updating it
 RUN curl -L https://foundry.paradigm.xyz | bash
 RUN foundryup
 
+# Back to root
 USER root
 SHELL ["/bin/sh", "-c"]
