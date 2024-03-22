@@ -22,7 +22,8 @@
       "extensions": [
         "NomicFoundation.hardhat-solidity",
         "tintinweb.solidity-visual-auditor",
-        "JuanBlanco.solidity"
+        "trailofbits.weaudit",
+        "tintinweb.solidity-metrics"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "fish"
