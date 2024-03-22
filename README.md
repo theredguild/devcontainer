@@ -2,7 +2,7 @@
 ## Requirements
 1. Visual Studio Code.
 1. DevContainer extension by MS: `ms-vscode-remote.remote-containers`.
-1. Must have installed on your local OS: docker and docker-buildx.
+1. Must have installed on your local OS: `docker` and `docker-buildx`.
 
 ## Kick-off
 1. Start the docker service, and make sure your user is in the `docker` group.
@@ -31,5 +31,9 @@ volume.
 - fuzzing: slither, medusa
 - others: node, npm, python, go
 - terminal: fish with starship theme
-- extensions: hardhat, visual auditor and solidity
+- extensions:
+   - `NomicFoundation.hardhat-solidity`,
+   - `tintinweb.solidity-visual-auditor`,
+   - `trailofbits.weaudit`,
+   - `tintinweb.solidity-metrics`
 
