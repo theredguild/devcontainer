@@ -18,8 +18,11 @@ RUN apt-get install -y python3-pip golang
 RUN curl -fsSL https://deb.nodesource.com/setup_21.x | sudo -E bash - &&\
 sudo apt-get install -y nodejs
 
-# # Install Hardhat
-RUN npm install -g hardhat
+# # Install PNPM
+RUN npm install -g pnpm
+
+# # Install hardhat
+RUN pnpm install hardhat
 
 # Install solc-select
 RUN pip3 install solc-select
