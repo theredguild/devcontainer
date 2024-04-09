@@ -29,7 +29,7 @@ volume.
 - frameworks: hardhat, foundry
 - utilities: solc-select
 - fuzzing: slither, medusa
-- others: node, npm, python, go
+- others: node, pnpm, python, go
 - terminal: fish with starship theme
 - extensions:
    - `NomicFoundation.hardhat-solidity`,
