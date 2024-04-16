@@ -37,3 +37,6 @@ volume.
    - `trailofbits.weaudit`,
    - `tintinweb.solidity-metrics`
 
+
+## Useful resources
+- Workshop: [Come and build your own devContainer!](https://eth-security-explorations.notion.site/Come-and-build-your-own-devContainer-13b3c0d74d7f448f836419281d916369) @ the-mu
