@@ -59,6 +59,6 @@ nvm ls
 ```
 
 ### Links
-- Article (references this repo): [Where do you run your code?](blog.theredguild.org/where-do-you-run-your-code/)
+- Article (references this repo): [Where do you run your code?](https://blog.theredguild.org/where-do-you-run-your-code/)
 - Workshop: [Come and build your own devContainer!](https://eth-security-explorations.notion.site/Come-and-build-your-own-devContainer-13b3c0d74d7f448f836419281d916369) @ the-mu
 
