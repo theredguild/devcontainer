@@ -2,7 +2,8 @@
     // For format details, see https://aka.ms/devcontainer.json.
     "name": "TRG's DevContainer",
 
-    // You can use image or directly use a Dockerfile or Docker Compose file.
+    // You can use "image" or directly use "build" specifying
+    // a Dockerfile or Docker Compose file.
     // More info: https://containers.dev/guide/dockerfile
     // https://github.com/devcontainers/images/tree/main/src/base-alpine
     "image": "mcr.microsoft.com/devcontainers/base:debian",
@@ -11,7 +12,8 @@
     // },
     // Features to add to the dev container. More info: https://containers.dev/features.
     "features": {
-    // By default, alpine brings this feature, so I'll leave it commented for you to see:
+    // By default, debian's Dockerfile brings a similar configuration
+    // zsh might be installed anyways, but I'll leave the rest commented for you to see:
       "ghcr.io/devcontainers/features/common-utils:2": {
         "installZsh": "false"
         // "username": "vscode",
@@ -28,7 +30,7 @@
       "ghcr.io/meaningful-ooo/devcontainer-features/fish:1": {}
     },
 
-	// Configure tool-specific properties.
+    // Configure tool-specific properties.
     "customizations": {
     // Configure properties specific to VS Code.
       "vscode": {
@@ -49,7 +51,7 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [3000],
 
-  // Use 'portsAttributes' to set default properties for specific forwarded ports. 
+    // Use 'portsAttributes' to set default properties for specific forwarded ports. 
 	// More info: https://containers.dev/implementors/json_reference/#port-attributes
 	// "portsAttributes": {
 	// 	"3000": {
@@ -59,8 +61,8 @@
 	// },
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-  // We're using a gist, but you can also reference the raw install-tool from your repo.
-  // Unless you mount the scripts folder as
+    // We're using a gist, but you can also reference the raw install-tool from your repo.
+    // Unless you mount the scripts folder as
     "postCreateCommand": "curl https://raw.githubusercontent.com/theredguild/devcontainer/article/.devcontainer/scripts/install-tools.sh | fish -i && fish"
 
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
