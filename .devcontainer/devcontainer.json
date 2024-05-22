@@ -61,7 +61,7 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
   // We're using a gist, but you can also reference the raw install-tool from your repo.
   // Unless you mount the scripts folder as
-    "postCreateCommand": "curl https://raw.githubusercontent.com/theredguild/devcontainer/article/.devcontainer/scripts/install-tools.sh | fish -i && . ~/.config/fish/config.fish"
+    "postCreateCommand": "curl https://raw.githubusercontent.com/theredguild/devcontainer/article/.devcontainer/scripts/install-tools.sh | fish -i && fish"
 
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
