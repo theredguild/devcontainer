@@ -1,35 +1,70 @@
 {
-  "name": "TRG's DevContainer",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
-  "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": "true",
-      "username": "vscode",
-      "userUid": "1000",
-      "userGid": "1000",
-      "upgradePackages": "true"
+    // For format details, see https://aka.ms/devcontainer.json.
+    "name": "TRG's DevContainer",
+
+    // You can use image or directly use a Dockerfile or Docker Compose file.
+    // More info: https://containers.dev/guide/dockerfile
+    // https://github.com/devcontainers/images/tree/main/src/base-alpine
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
+    // "build": {
+    //   "dockerfile": "Dockerfile"
+    // },
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    "features": {
+    // By default, alpine brings this feature, so I'll leave it commented for you to see:
+      "ghcr.io/devcontainers/features/common-utils:2": {
+        "installZsh": "false"
+        // "username": "vscode",
+        // "userUid": "1000",
+        // "userGid": "1000",
+        // "upgradePackages": "true"
+      },
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "ghcr.io/devcontainers/features/go:1": {},
+      "ghcr.io/devcontainers/features/rust:1": {},
+      "ghcr.io/devcontainers/features/python:1": {},
+      "ghcr.io/devcontainers/features/node:1": {},
+      "ghcr.io/devcontainers-contrib/features/pnpm:2": {},
+      "ghcr.io/meaningful-ooo/devcontainer-features/fish:1": {}
     },
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest",
-      "ppa": "false"
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "NomicFoundation.hardhat-solidity",
-        "tintinweb.solidity-visual-auditor",
-        "trailofbits.weaudit",
-        "tintinweb.solidity-metrics"
-      ],
-      "settings": {
-        "terminal.integrated.defaultProfile.linux": "fish"
+
+	// Configure tool-specific properties.
+    "customizations": {
+    // Configure properties specific to VS Code.
+      "vscode": {
+        "extensions": [
+          "NomicFoundation.hardhat-solidity",
+          "tintinweb.solidity-visual-auditor",
+          "trailofbits.weaudit",
+          "tintinweb.solidity-metrics"
+        ],
+        "settings": {
+          "terminal.integrated.defaultProfile.linux": "fish",
+          "terminal.integrated.profiles.linux": { "fish": { "path": "/usr/bin/fish" } }
+        }
       }
-    }
-  },
-  "forwardPorts": [],
-  "postCreateCommand": "uname -a"
+    },
+
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [3000],
+
+  // Use 'portsAttributes' to set default properties for specific forwarded ports. 
+	// More info: https://containers.dev/implementors/json_reference/#port-attributes
+	// "portsAttributes": {
+	// 	"3000": {
+	// 		"label": "Hello Remote World",
+	// 		"onAutoForward": "notify"
+	// 	}
+	// },
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+  // We're using a gist, but you can also reference the raw install-tool from your repo.
+  // Unless you mount the scripts folder as
+    "postCreateCommand": "curl https://raw.githubusercontent.com/theredguild/devcontainer/article/.devcontainer/scripts/install-tools.sh | fish -i && . ~/.config/fish/config.fish"
+
+    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
 }
+
+
