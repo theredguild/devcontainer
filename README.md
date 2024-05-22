@@ -1,4 +1,6 @@
-# The Red Guild's devcontainer exploration
+# The Red Guild's devcontainer exploration (article branch)
+This is a branch explicitly created as a demonstration, to use our devcontainer
+please refer to our most updated branch, which is the **main** branch.
 ## Requirements
 1. Visual Studio Code.
 1. DevContainer extension by MS: `ms-vscode-remote.remote-containers`.
@@ -29,14 +31,34 @@ volume.
 - frameworks: hardhat, foundry
 - utilities: solc-select
 - fuzzing: slither, medusa
-- others: node, pnpm, python, go
+- others: node (via nvm), yarn, pnpm, python, go
 - terminal: fish with starship theme
 - extensions:
    - `NomicFoundation.hardhat-solidity`,
    - `tintinweb.solidity-visual-auditor`,
    - `trailofbits.weaudit`,
    - `tintinweb.solidity-metrics`
+   - (a few more language specific)
 
 
 ## Useful resources
+### Install different node versions with nvm
+```bash
+# Swtich to a bash shell
+bash
+# Source the nvm shell
+source $NVM_DIR/nvm.sh
+# Install the latest version
+nvm install --lts
+# Install version 14
+nvm install 14
+# Use a specific version
+nvm use 12.22.7
+# List current installations
+nvm ls
+```
+
+### Links
+- Article (references this repo): [Where do you run your code?](blog.theredguild.org/where-do-you-run-your-code/)
 - Workshop: [Come and build your own devContainer!](https://eth-security-explorations.notion.site/Come-and-build-your-own-devContainer-13b3c0d74d7f448f836419281d916369) @ the-mu
+
