@@ -26,17 +26,41 @@ volume.
  devcontainer.
 
 ## What's in it?
-- frameworks: hardhat, foundry
+- frameworks: foundry, hardhat (manual install)
 - utilities: solc-select
 - fuzzing: slither, medusa
-- others: node, pnpm, python, go
-- terminal: fish with starship theme
+- others: node, npm, pnpm, yarn, python, go
+- terminal: zsh with Oh-My-ZSH
 - extensions:
    - `NomicFoundation.hardhat-solidity`,
    - `tintinweb.solidity-visual-auditor`,
    - `trailofbits.weaudit`,
    - `tintinweb.solidity-metrics`
 
-
 ## Useful resources
+### Install different node versions with nvm
+```bash
+# Install the latest version
+nvm install --lts
+# Install version 14
+nvm install 14
+# Use a specific version
+nvm use 12.22.7
+# List current installations
+nvm ls
+```
+
+### Install Hardhat
+Hardhat does not come by default, since the official documentation states
+that you should install it locally on the working repository with `npx`.
+
+If you wish to install hardhat globally, you can run:
+`pnpm install hardhat` wherever you want.
+
+The other reason it does not come by default, it's because the nvm
+installation is not trivial at all, and working with its peculiarities
+inside a Dockerfile to install packages is not worth the mess.
+
+### Links
+- Article (references this repo's branch article): [Where do you run your code?](https://blog.theredguild.org/where-do-you-run-your-code/)
 - Workshop: [Come and build your own devContainer!](https://eth-security-explorations.notion.site/Come-and-build-your-own-devContainer-13b3c0d74d7f448f836419281d916369) @ the-mu
