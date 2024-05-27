@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/vscode/devcontainers/base:debian
 # Update packages.
 RUN apt-get update
 
-# Install Python, Go, and other dependencies
+# Install pipx
 RUN apt-get install -y pipx
 
 # Set the default shell to zsh
@@ -13,6 +13,7 @@ ENV SHELL=/usr/bin/zsh
 # Running everything under zsh
 SHELL ["/usr/bin/zsh", "-c"]
 
+# Dropping privileges
 USER vscode
 
 # Install golang's latest version through asdf
