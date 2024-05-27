@@ -57,7 +57,7 @@ Today's virtualization methods have evolved in a way that they do not exactly ma
 
 **Docker** is the most popular platform (or at least from my observable universe) for creating, deploying, and running containers. You could do this with Kubernetes as well, so it shouldn’t be much more difficult to pivot once you’ve interiorized the core principles.
 
-## Docker terms
+#### Docker terms
 
 1. **Image**: A Docker image is a lightweight, standalone, and executable software package that includes everything needed to run a piece of software, including the code, a runtime, libraries, environment variables, and configuration files. Images are built from a series of layers that are defined in a Dockerfile. Each layer represents an instruction in the Dockerfile. Images are immutable, meaning once they are created, they do not change.
 2. **Container**: A container is a runnable instance of an image. When you start an image, Docker creates a container from that image. Containers isolate software from its environment and ensure that it works uniformly despite differences for instance between development and staging. Containers are ephemeral, meaning they can be started, stopped, moved, and deleted. Each container has its own filesystem, provided by the image, and its own isolated system resources (CPU, memory, I/O, network, etc.). If you do not save the state of your container, all changes will be lost once it is terminated.
@@ -68,7 +68,7 @@ To summarize:
 - An **image** is a static snapshot of the environment and application, used to create containers.
 - A **container** is an instance of an image that runs the actual application.
 - A **volume** is used to persist data outside of the lifecycle of a single container, helping manage data across container instances and updates.
-- 
+
 So, to get started with **Docker** you should:
 
 1. Install Docker on your system by following the official documentation for your operating system:`docker` and `docker-buildx` (the latter is not strictly necessary, but as a minimum it helps to build faster).
