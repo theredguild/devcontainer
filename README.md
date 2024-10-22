@@ -1,4 +1,7 @@
 # The Red Guild's devcontainer exploration
+
+_Note: We are working on a new and updated version of this container. Feel free to suggest improvements or requirements as well._
+
 ## Requirements
 1. Visual Studio Code.
 1. DevContainer extension by MS: `ms-vscode-remote.remote-containers`.
