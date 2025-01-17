@@ -2,10 +2,6 @@
 # check=error=true
 
 ## Multi-stage build!
-# Pull latest prebuilt Echidna binary.
-# TODO: "Ensure the base image uses a non latest version tag"
-FROM --platform=linux/amd64 ghcr.io/crytic/echidna/echidna:latest AS echidna
-
 # Grab at least python 3.12
 FROM python:3.12-slim as python-base
 
@@ -77,57 +73,18 @@ RUN pnpm install hardhat -g
 
 # Python installations
 # Install slither (through napalm-core), crytic-compile (through napalm-core), solc (through napalm-core), vyper, mythx, panoramix, slider-lsp (needed for contract explorer), napalm-toolbox
-RUN pipx install napalm-core --include-deps && \ 
-    pipx install vyper && \ 
+RUN pipx install vyper && \ 
     pipx install panoramix-decompiler && \ 
-    pipx install slither-lsp && \ 
-    pipx install mythril && \ 
-    pipx install napalm-toolbox && \ 
-    pipx install semgrep && \ 
-    pipx install slitherin && \ 
-    solc-select install 0.4.26 0.5.17 0.6.12 0.7.6 0.8.10 latest && solc-select use latest
-
-# Fetch and install setups
-## ityfuzz
-RUN curl -fsSL https://ity.fuzz.land/ | zsh
-RUN ityfuzzup
+    pipx install solc-select && solc-select install 0.8.10 latest && solc-select use latest
 
 ## Foundry framework
 RUN curl -fsSL https://foundry.paradigm.xyz | zsh
 RUN foundryup
 
-## Aderyn
-RUN curl -fsSL https://raw.githubusercontent.com/Cyfrin/aderyn/dev/cyfrinup/install | zsh
-RUN cyfrinup
-
 ## Halmos
 ### First installs uv, and then the latest version of halmos and adds it to PATH
 RUN curl -fsSL https://astral.sh/uv/install.sh | bash && \
     uv tool install halmos
-
-## Heimdall
-### Replace 'bifrost' call for 'bifrost -B' so it downloads de binary instead of compiling it.
-### Right now this debian uses a glibc version lower than heimdall needs.
-RUN curl -fsSL https://get.heimdall.rs | zsh && \
-    . ${HOME}/.cargo/env && \
-    ${HOME}/.bifrost/bin/bifrost
-
-# Git clone, compile kind of installations
-## Install Medusa
-### Set working directory for Medusa operations
-WORKDIR ${HOME}/medusa
-RUN git clone https://github.com/crytic/medusa ${HOME}/medusa && \
-    export LATEST_TAG="$(git describe --tags | sed 's/-[0-9]\+-g\w\+$//')" && \
-    git checkout "$LATEST_TAG" && \
-    go build -trimpath -o=${HOME}/.local/bin/medusa -ldflags="-s -w" && \
-    chmod 755 ${HOME}/.local/bin/medusa
-    #### Return to the home directory and clean up
-WORKDIR ${HOME}
-RUN rm -rf medusa/
-
-# Copy prebuilt Echidna binary
-COPY --chown=vscode:vscode --from=echidna /usr/local/bin/echidna ${HOME}/.local/bin/echidna
-RUN chmod 755 ${HOME}/.local/bin/echidna
 
 # Clone useful repositories inside quests
 WORKDIR ${HOME}/quests
@@ -141,7 +98,6 @@ USER root
 
 ## Add completions for medusa, anvil, cast, forge.
 RUN mkdir -p /usr/share/zsh/site-functions && \
-    medusa completion zsh > /usr/share/zsh/site-functions/_medusa && \
     for tool in anvil cast forge; do \
         "$tool" completions zsh > /usr/share/zsh/site-functions/_$tool; \
     done
@@ -157,5 +113,5 @@ RUN echo '\ncat /etc/motd\n' >> ~/.zshrc
 USER vscode
 
 # Example HEALTHCHECK, we don't need once since we're not using services. If you add services in the future, you would need to add "something" like this:
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 CMD \
-  zsh -c 'command -v echidna && command -v medusa && command -v slither && command -v solc && echo "OK" || exit 1'
+HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 CMD \
+  zsh -c 'command -v forge && command -v solc && echo "OK" || exit 1'

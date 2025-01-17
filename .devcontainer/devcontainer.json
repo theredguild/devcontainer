@@ -24,10 +24,10 @@
     // "--read-only",
 
     // Drop all capabilities
-    "--cap-drop=ALL",
+    // "--cap-drop=ALL",
 
     // A few security additions (AppArmor & no new privileges)
-    "--security-opt", "no-new-privileges",
+    // "--security-opt", "no-new-privileges",
     "--security-opt", "apparmor:docker-default",
 
     // // Disable SELinux.
@@ -68,14 +68,14 @@
         //   tintinweb.vscode-inline-bookmarks
         //   eamodio.gitlens
         // includes what is listed above ^
-        "tintinweb.ethereum-security-bundle",
+        // "tintinweb.ethereum-security-bundle",
         "tintinweb.vscode-ethover",
         "trailofbits.weaudit",
         "tintinweb.vscode-inline-bookmarks", 
         "tintinweb.vscode-solidity-language",
         "tintinweb.graphviz-interactive-preview",
         "NomicFoundation.hardhat-solidity",
-        "Olympixai.olympix",
+        // "Olympixai.olympix",
         "trailofbits.contract-explorer",
         // dependency for panoramix
         "tintinweb.vscode-decompiler"

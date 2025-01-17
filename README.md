@@ -9,7 +9,9 @@ install the most popular tools, so they can all work seamlessly, and at the same
 by default. If you want to know more, and really want to take advante of this devcontainer read
 below.
 
-There's also a minimized version under the `minimal` branch.
+This is the minimized version of the devcontainer. It has some security features disabled to be able
+to run `sudo`, or escalate privileges. Aditionnaly, we have removed some heavy tooling for it to be
+more lightweight. Feel free to disable as many extensions as you like.
 
 ## Requirements
 1. Visual Studio Code.
