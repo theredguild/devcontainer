@@ -1,6 +1,8 @@
 # The Red Guild's devcontainer exploration
 
-_Note: We are working on a new and updated version of this container. Feel free to suggest improvements or requirements as well._
+Note: We are currently updating a this container. Feel free to suggest improvements or requirements
+as well.
+Check out similar projects like @Deivitto's auditor-docker and @trailofbit's eth-security-toolbox.
 
 ## Requirements
 1. Visual Studio Code.
@@ -28,19 +30,84 @@ volume.
 - You can even clone a new repository in a new volume based on the same
  devcontainer.
 
-## What's in it?
-- frameworks: foundry, hardhat (manual install)
-- utilities: solc-select
-- fuzzing: slither, medusa
-- others: node, npm, pnpm, yarn, python, go
-- terminal: zsh with Oh-My-ZSH
-- extensions:
-   - `NomicFoundation.hardhat-solidity`,
-   - `tintinweb.solidity-visual-auditor`,
-   - `trailofbits.weaudit`,
-   - `tintinweb.solidity-metrics`
+## Features Overview
 
-## Useful resources
+## Extensions
+- JuanBlanco.solidity
+- tintinweb.solidity-visual-auditor
+- tintinweb.solidity-metrics
+- tintinweb.vscode-solidity-flattener
+- tintinweb.vscode-vyper
+- tintinweb.vscode-LLL
+- streetsidesoftware.code-spell-checker
+- gimenete.github-linker
+- ryu1kn.partial-diff
+- tintinweb.vscode-inline-bookmarks
+- eamodio.gitlens
+- tintinweb.vscode-ethover
+- trailofbits.weaudit
+- tintinweb.vscode-inline-bookmarks
+- tintinweb.vscode-solidity-language
+- tintinweb.graphviz-interactive-preview
+- NomicFoundation.hardhat-solidity
+- Olympixai.olympix
+- trailofbits.contract-explorer
+- tintinweb.vscode-decompiler
+
+## Frameworks
+- **Foundry**: Really fast modular toolkit (forge, anvil, cast).
+- **Hardhat**: Dev environment to develop, deploy, test and debug. Manual installation on project folder, read below.
+
+### Security Tools
+- **Fuzzing**:
+  - **Medusa**: Parallelized, coverage-guided, mutational Solidity smart contract fuzzing, powered by go-ethereum.
+  - **Echidna**: Fuzz testing for Ethereum contracts (prebuilt binary).
+  - **ityfuzz**: Ethereum fuzzing tool for contract vulnerabilities.
+
+- **Static Analysis**:
+  - **Slither**: Static analysis for Solidity and Vyper.
+    - **Slitherin**: Slither detectors.
+  - **Semgrep**: Lightweight static analysis with custom rule definitions.
+
+- **Symbolic execution**:
+  - **Mythril**: A symbolic-execution-based securty analysis tool for EVM bytecode. 
+  - **Halmos**: A symbolic testing tool for EVM smart contracts.
+
+- **Decompilers**:
+  - **Panoramix**: Smart contract decompiler.
+ 
+- **Other**:
+  - **Slither-LSP**: Language server for enhanced contract analysis.
+  - **napalm**: A project management utility for custom solidity vulnerability detectors.
+  - **Heimdall**: An advanced EVM smart contract toolkit specializing in bytecode analysis and extracting information from unverified contracts.
+  - **Aderyn**: Rust-based Solidity AST analyzer.
+
+### Utilities
+- **solc-select**: Solc version manager for multiple Solidity versions.
+- **vyper**: Pythonic language for Ethereum smart contracts.
+- **Package Managers**:
+  - **asdf**: Multiple runtime version manager.
+  - **npm**, **pnpm**, **yarn**: JavaScript package managers.
+  - **pipx**: Isolated Python package manager.
+  - **cargo**: Rust package manager.
+  - **uv**: Utility manager.
+  - **nvm**: Node.js version manager.
+
+
+### Languages
+- **JavaScript**, **Python**, **Go**, **Rust**, **Vyper**, **Solidity**.
+
+### Shell
+**ZSH**. Configured with Oh-My-ZSH and autocompletions for: **medusa**, **anvil**, **cast**, **forge**.
+
+### Additional Repositories
+- **building-secure-contracts**: Repository with security-focused Solidity examples.
+
+### Notes
+- Multi-stage build ensures reproducibility.
+- Minimal base image (Debian).
+
+## Manual interventions
 ### Install different node versions with nvm
 ```bash
 # Install the latest version
@@ -63,6 +130,61 @@ If you wish to install hardhat globally, you can run:
 The other reason it does not come by default, it's because the nvm
 installation is not trivial at all, and working with its peculiarities
 inside a Dockerfile to install packages is not worth the mess.
+
+### Natspec Smells
+
+- Verifies natspec for: constructors, variables, functions, structs, errors, events, modifiers
+- Finds misspelled or missing @param or @return's.
+- Lets you enforce the need for @inheritdoc in public/external functions.
+- Can integrate on your daily workflow, or just as a final check.
+
+```
+npx @defi-wonderland/natspec-smells --include "src/**/*.sol"
+```
+
+#### Recommended setup
+
+1. Install the package:
+
+   ```bash
+   yarn add --dev @defi-wonderland/natspec-smells
+   ```
+
+2. Create a config file named `natspec-smells.config.js`, you can use the following as an example:
+
+   ```javascript
+   /**
+    * List of supported options: https://github.com/defi-wonderland/natspec-smells?tab=readme-ov-file#options
+    */
+
+   /** @type {import('@defi-wonderland/natspec-smells').Config} */
+   module.exports = {
+     include: 'src/**/*.sol',
+     exclude: '(test|scripts)/**/*.sol',
+   };
+   ```
+
+3. Run
+   ```bash
+   yarn natspec-smells
+   ```
+
+### Semgrep
+Currently semgrep supports [Solidity](https://semgrep.dev/docs/language-support/) in `experimental` mode. Some of the rules may not work until Solidity is in `beta` at least.
+
+> **Important:** Some of the rules utilize the [taint mode](https://semgrep.dev/docs/writing-rules/data-flow/taint-mode), which is restricted to the same function in the open-source version of semgrep. To take advantage of intra-procedural taint analysis, you must include the `--pro` flag with each command. Please note that this requires semgrep Pro.
+
+1) By cloning the repository:
+
+  ```shell
+  $ semgrep --config solidity/security path/to/your/project
+  ```
+
+2) By using [semgrep registry](https://semgrep.dev/r):
+
+  ```shell
+  $ semgrep --config p/smart-contracts path/to/your/project
+  ```
 
 ### Links
 - Article (references this repo's branch article): [Where do you run your code?](https://blog.theredguild.org/where-do-you-run-your-code/)
