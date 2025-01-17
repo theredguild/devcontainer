@@ -1,0 +1,6 @@
+# This shouldn't be necessary given our devcontainer.json isolation.
+# But we need at least motd to be able to be copied. And if its here, not even COPY clauses would work.
+.git
+.devcontainer
+README.md
+Dockerfile

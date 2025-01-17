@@ -2,8 +2,12 @@
 # check=error=true
 
 ## Multi-stage build!
-# Pull prebuilt Echidna binary
+# Pull latest prebuilt Echidna binary.
+# TODO: "Ensure the base image uses a non latest version tag"
 FROM --platform=linux/amd64 ghcr.io/crytic/echidna/echidna:latest AS echidna
+
+# Grab at least python 3.12
+FROM python:3.12-slim as python-base
 
 # Base debian build (latest).
 FROM mcr.microsoft.com/vscode/devcontainers/base:debian
@@ -11,9 +15,12 @@ FROM mcr.microsoft.com/vscode/devcontainers/base:debian
 # Switch to root (the default might be root anyway)
 USER root
 
+COPY --from=python-base /usr/local /usr/local
+
 # Super basic stuff to get everything started
 RUN apt-get update -y && apt-get install -y \
-    zsh python3-pip pipx curl git sudo pkg-config
+    zsh python3-dev libpython3-dev build-essential vim curl git sudo pkg-config \
+    --no-install-recommends
 
 # The base container usually has a “vscode” user. If not, create one here.
 RUN echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
@@ -22,11 +29,24 @@ RUN echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 USER vscode
 WORKDIR /home/vscode
 
-# Set PATH with .local/bin included.
+# Set HOME and create quests folder
 ENV HOME=/home/vscode
+RUN mkdir -p ${HOME}/quests && chown vscode:vscode ${HOME}/quests
+
+# Set neded paths (for python, pix, pnpm)
+ENV USR_LOCAL_BIN=/usr/local/bin
 ENV LOCAL_BIN=${HOME}/.local/bin
-ENV PATH=${PATH}:${LOCAL_BIN}
+ENV PNPM_HOME=${HOME}/.local/share/pnpm
+ENV PATH=${PATH}:${USR_LOCAL_BIN}:${LOCAL_BIN}:${PNPM_HOME}
+
+# Install pipx
+RUN python3 -m pip install --no-cache-dir --upgrade pipx
+
+# Make sure pipx's paths are set
 RUN pipx ensurepath
+
+# Set asdf manager version
+ENV ASDF_VERSION=v0.15.0
 
 # Set the default shell to zsh
 ENV SHELL=/usr/bin/zsh
@@ -36,7 +56,7 @@ SHELL ["/usr/bin/zsh", "-ic"]
 
 
 # Install golang's latest version through asdf
-RUN git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.15.0 && \
+RUN git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch ${ASDF_VERSION}  && \
     echo '. $HOME/.asdf/asdf.sh' >> $HOME/.zshrc && \
     echo 'fpath=(${ASDF_DIR}/completions $fpath)' >> $HOME/.zshrc && \
     echo 'autoload -Uz compinit && compinit' >> $HOME/.zshrc && \
@@ -48,13 +68,16 @@ RUN git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.15.0 &
 ## Install rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && source $HOME/.cargo/env
 
+USER root
 ## Install nvm, yarn, npm, pnpm
-RUN curl -o- https://raw.githubusercontent.com/devcontainers/features/main/src/node/install.sh | sudo bash
+RUN curl -o- https://raw.githubusercontent.com/devcontainers/features/main/src/node/install.sh | bash
+USER vscode
+
+RUN pnpm install hardhat -g
 
 # Python installations
-## Install slither-analyzer, crytic-compile (through napalm-core), solc (through napalm-core), vyper, mythx, panoramix, slider-lsp (needed for contract explorer), napalm-toolbox
+# Install slither (through napalm-core), crytic-compile (through napalm-core), solc (through napalm-core), vyper, mythx, panoramix, slider-lsp (needed for contract explorer), napalm-toolbox
 RUN pipx install napalm-core --include-deps && \ 
-    pipx install slither-analyzer && \ 
     pipx install vyper && \ 
     pipx install panoramix-decompiler && \ 
     pipx install slither-lsp && \ 
@@ -63,8 +86,6 @@ RUN pipx install napalm-core --include-deps && \
     pipx install semgrep && \ 
     pipx install slitherin && \ 
     solc-select install 0.4.26 0.5.17 0.6.12 0.7.6 0.8.10 latest && solc-select use latest
-
-
 
 # Fetch and install setups
 ## ityfuzz
@@ -93,21 +114,27 @@ RUN curl -fsSL https://get.heimdall.rs | zsh && \
 
 # Git clone, compile kind of installations
 ## Install Medusa
-RUN git clone https://github.com/crytic/medusa.git ${HOME}/medusa && \
-    cd ${HOME}/medusa && \
+### Set working directory for Medusa operations
+WORKDIR ${HOME}/medusa
+RUN git clone https://github.com/crytic/medusa ${HOME}/medusa && \
     export LATEST_TAG="$(git describe --tags | sed 's/-[0-9]\+-g\w\+$//')" && \
     git checkout "$LATEST_TAG" && \
     go build -trimpath -o=${HOME}/.local/bin/medusa -ldflags="-s -w" && \
-    chmod 755 ${HOME}/.local/bin/medusa && \
-    cd ${HOME} && rm -rf medusa
+    chmod 755 ${HOME}/.local/bin/medusa
+    #### Return to the home directory and clean up
+WORKDIR ${HOME}
+RUN rm -rf medusa/
 
 # Copy prebuilt Echidna binary
 COPY --chown=vscode:vscode --from=echidna /usr/local/bin/echidna ${HOME}/.local/bin/echidna
 RUN chmod 755 ${HOME}/.local/bin/echidna
 
-# Clone useful repositories
+# Clone useful repositories inside quests
+WORKDIR ${HOME}/quests
 RUN git clone --depth 1 https://github.com/crytic/building-secure-contracts.git
 
+# Back to home in case we want to do something later.
+WORKDIR ${HOME}
 
 # Do some things as root
 USER root
@@ -129,3 +156,6 @@ RUN echo '\ncat /etc/motd\n' >> ~/.zshrc
 ## back to user!
 USER vscode
 
+# Example HEALTHCHECK, we don't need once since we're not using services. If you add services in the future, you would need to add "something" like this:
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 CMD \
+  zsh -c 'command -v echidna && command -v medusa && command -v slither && command -v solc && echo "OK" || exit 1'

@@ -1,8 +1,15 @@
 # The Red Guild's devcontainer exploration
 
-Note: We are currently updating a this container. Feel free to suggest improvements or requirements
-as well.
-Check out similar projects like @Deivitto's auditor-docker and @trailofbit's eth-security-toolbox.
+This container is always a work in progress. Feel free to suggest improvements or requirements as
+well. Check out similar projects like **@Deivitto**'s auditor-docker and **@trailofbit's**
+eth-security-toolbox.
+
+The most important thing about this devcontainer, is that we always try to find the best way to
+install the most popular tools, so they can all work seamlessly, and at the same time add security
+by default. If you want to know more, and really want to take advante of this devcontainer read
+below.
+
+There's also a minimized version under the `minimal` branch.
 
 ## Requirements
 1. Visual Studio Code.
@@ -10,18 +17,18 @@ Check out similar projects like @Deivitto's auditor-docker and @trailofbit's eth
 1. Must have installed on your local OS: `docker` and `docker-buildx`.
 
 ## Kick-off
-1. Start the docker service, and make sure your user is in the `docker` group.
-   Otherwise, log in back again.
-1. Clone this repo and open the folder with vscode how you like. Running
- `code .` works well.
-1. Select _"Reopen in Container"_ and wait. This will build the container volume.
-1. If this is your first time, you'll be prompted to press enter on a console
-   log that triggers the terminal.
-1. If not you can go to the extensions section on your side, click the Remote
-    Explorer tab and select the active devcontainer.
+1. Start the docker service, and make sure your user is in the `docker` group. Otherwise, add
+   yourself to it but you'll have to log in back again.
+2. Clone this repo, if you want a minimal version checkout `minimal`.
+3. Open the folder with **vscode** how you like. Running `code .` works well.
+4. Select **Reopen in Container** and wait. This will build the container volume.
+5. If this is your first time, you'll be prompted to press enter on a console log that triggers the
+   terminal.
+6. If not you can go to the extensions section on your side, click the **Remote Explorer** tab and
+    select the active devcontainer.
 
 ## Usage
-If you open the Command Palette (Ctrl+Shift+p or whatever your shortcut is) you
+If you open the **Command Palette** (Ctrl+Shift+p or whatever your shortcut is) you
  can access several features:
 - You can attach VS Code to a running container, where you can open any folder
  or Clone a repository.
@@ -32,7 +39,8 @@ volume.
 
 ## Features Overview
 
-## Extensions
+### Extensions
+
 - JuanBlanco.solidity
 - tintinweb.solidity-visual-auditor
 - tintinweb.solidity-metrics
@@ -54,9 +62,9 @@ volume.
 - trailofbits.contract-explorer
 - tintinweb.vscode-decompiler
 
-## Frameworks
+### Frameworks
 - **Foundry**: Really fast modular toolkit (forge, anvil, cast).
-- **Hardhat**: Dev environment to develop, deploy, test and debug. Manual installation on project folder, read below.
+- **Hardhat**: Dev environment to develop, deploy, test and debug.
 
 ### Security Tools
 - **Fuzzing**:
@@ -79,7 +87,8 @@ volume.
 - **Other**:
   - **Slither-LSP**: Language server for enhanced contract analysis.
   - **napalm**: A project management utility for custom solidity vulnerability detectors.
-  - **Heimdall**: An advanced EVM smart contract toolkit specializing in bytecode analysis and extracting information from unverified contracts.
+  - **Heimdall**: An advanced EVM smart contract toolkit specializing in bytecode analysis and
+    extracting information from unverified contracts.
   - **Aderyn**: Rust-based Solidity AST analyzer.
 
 ### Utilities
@@ -104,32 +113,82 @@ volume.
 - **building-secure-contracts**: Repository with security-focused Solidity examples.
 
 ### Notes
-- Multi-stage build ensures reproducibility.
-- Minimal base image (Debian).
+- Remember to disable telemetry. `Ctrl+Shift+P > Open Settings (UI) >` type `telemetry` and uncheck
+all the boxes. Alternatively you can add them directly by going to `Open Settings (JSON)`, example:
+```json
+  "telemetry.telemetryLevel": "off",
+  "gitlens.telemetry.enabled": false,
+  "partialDiff.enableTelemetry": false,
+  ```
 
-## Manual interventions
-### Install different node versions with nvm
+
+## Manual interventions & info
+
+### Hardening: Enabling SELinux
+SELinux (Security-Enhanced Linux) is a mandatory access control (MAC) system that restricts processes and users to only the resources they are explicitly allowed to access, enhancing system security.
+
+You can check if you have this already enabled by running `sudo sestatus`
+
+If you don't have SELinux installed, and you really want up your game, and protect your host from
+container escapes go ahead and install it. Find whichever guide convinves you the most! Afterward,
+enable it inside `/etc/docker/daemon.json` (it should be enabled by default afaik).
 ```bash
-# Install the latest version
-nvm install --lts
-# Install version 14
-nvm install 14
-# Use a specific version
-nvm use 12.22.7
-# List current installations
-nvm ls
+❯ cat /etc/docker/daemon.json 
+{
+  "selinux-enabled": true
+}
 ```
 
-### Install Hardhat
-Hardhat does not come by default, since the official documentation states
-that you should install it locally on the working repository with `npx`.
+To manually disable SELinux you can uncomment the following line:
+```json
+    // Disable SELinux.
+    // "--security-opt", "seccomp=unconfined"
+```
 
-If you wish to install hardhat globally, you can run:
-`pnpm install hardhat` wherever you want.
+### Hardening: Enabling AppArmor
+AppArmor is a Linux security module that enforces file and network access restrictions for applications through profiles. It sometimes can be more straighforward than SELinux.
 
-The other reason it does not come by default, it's because the nvm
-installation is not trivial at all, and working with its peculiarities
-inside a Dockerfile to install packages is not worth the mess.
+You can check it has been enabled by running `sudo apparmor_status`. 
+
+This has been enabled via the argument:
+```json
+"--security-opt", "apparmor:docker-default"`
+```
+
+
+### Hardening: Dropping capabilities
+Capabilities in Linux are fine-grained permissions that allow processes to perform specific
+privileged operations without granting full root privileges. They break down the all-or-nothing
+nature of root access into smaller, specific rights, improving security.
+
+We have done this by running the following argument: 
+```json
+"--cap-drop=ALL"
+```
+
+This allows us to reduce attack surface by limiting privileged operations. And avoid the need to run
+processes as full root.
+
+A few examples:
+- `CAP_NET_ADMIN`: Allows network administration (e.g., configuring interfaces).
+- `CAP_CHOWN`: Allows changing file ownership.
+
+
+### Hardening: No new privileges
+There's a flag that allows you to avoid getting the user more privilages than it already has. So if
+you want to use **sudo** or elevate privilages, you can restart your container after commenting the
+following line:
+```json
+"--security-opt", "no-new-privileges",
+```
+
+### Hardening: Read-only filesystem
+This may be one of the safest configurations out there but a hard one to use, at least for
+development environments. 
+
+It's trickier because it limits a lot what you can do. But if you want to
+experiment by yourself, you can start by enabling the `"--read-only"` flag and troubleshooting under
+the `mount` section which volumes are mandatory needed as writable.
 
 ### Natspec Smells
 
@@ -185,6 +244,80 @@ Currently semgrep supports [Solidity](https://semgrep.dev/docs/language-support/
   ```shell
   $ semgrep --config p/smart-contracts path/to/your/project
   ```
+
+## How to audit your Dockerfile
+
+```bash
+# Hadolint
+hadolint Dockerfile
+
+# Dockerfile linter 
+dockerfile-lint -f Dockerfile
+
+# Trivy misconfiguration
+trivy config .
+
+# Checkov
+checkov -f Dockerfile
+
+# First authenticate, open the link.
+snyk auth --auth-type=token
+# Run Snyk
+snyk container test app:latest --file=Dockerfile
+
+# Scan images with Dockle
+dockle theredguild/devsecops-toolkit:minimal
+dockle goodwithtech/dockle-test:v2
+
+```
+
+### Introduction to `asdf`
+
+`asdf` is a versatile version manager for programming languages and tools. It allows you to install
+and manage multiple versions of tools like Go, Python, Node.js, and more, all in one place. It's
+especially useful for projects requiring specific tool versions.
+
+#### Install Plugins
+Add the plugin for the language or tool you need:
+```bash
+asdf plugin add <language/tool>
+asdf plugin list all
+```
+
+Golang: `asdf plugin add golang`
+Python: `asdf plugin add python`
+Node.js: `asdf plugin add nodejs`
+
+#### You can list and install specific versions
+```bash
+asdf install golang 1.20.5
+asdf install python 3.11.5
+asdf install nodejs 18.15.0
+```
+
+#### Make a version be used globally
+```bash
+asdf global golang 1.20.5
+asdf global python 3.11.5
+```
+
+#### Make a version be used locally
+```bash
+asdf local golang 1.19.2
+asdf local python 3.10.4
+```
+
+### Install different node versions with nvm
+```bash
+# Install the latest version
+nvm install --lts
+# Install version 14
+nvm install 14
+# Use a specific version
+nvm use 12.22.7
+# List current installations
+nvm ls
+```
 
 ### Links
 - Article (references this repo's branch article): [Where do you run your code?](https://blog.theredguild.org/where-do-you-run-your-code/)

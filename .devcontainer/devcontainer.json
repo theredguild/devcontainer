@@ -13,14 +13,49 @@
   "features": {
   },
 
+  // Mount isolation. If you need to extract something from within the container, you can use docker cp, but use it at your own risk. If you want to develop your devcontainer, you should comment this things, otherwise your changes inside the live container won't persist.
+  // Disables mounting the host workspace into the container.
+  "workspaceMount": "source=none,target=/workspace,type=volume",
+  // Sets a workspace path entirely isolated within the container
+  "workspaceFolder": "/home/vscode/quests",
+  "runArgs": [
+    // Read only filesystem except for explicitly writable volumes (check mounts)
+    // For a dev environment this is more a hussle than a feature.
+    // "--read-only",
+
+    // Drop all capabilities
+    "--cap-drop=ALL",
+
+    // A few security additions (AppArmor & no new privileges)
+    "--security-opt", "no-new-privileges",
+    "--security-opt", "apparmor:docker-default",
+
+    // // Disable SELinux.
+    // "--security-opt", "seccomp=unconfined"
+
+    // If you really want to isolate it, just disconnect it from the internet. You should COPY your working files inside before, otherwise you'll have to mount them manually.
+    // "--network=none",
+    
+    // Play a little bit with resources.
+    // "--memory=512m",
+    // "--cpus=2"
+  ],
+
+  // Writable mounts in case you want to set --read-only above.
+  // "mounts": [
+  //   "source=tmp-vol,target=/tmp,type=volume",
+  //   "source=home-vscode-vol,target=/home/vscode,type=volume",
+  //   "source=var-vol,target=/var,type=volume",
+  //   "source=run-vol,target=/run,type=volume",
+  //   ],
+
+
 // Configure tool-specific properties.
   "customizations": {
   // Configure properties specific to VS Code.
     "vscode": {
       "extensions": [
         // check out https://marketplace.visualstudio.com/items?itemName=tintinweb.ethereum-security-bundle for more information
-        "tintinweb.ethereum-security-bundle",
-        // this includes:
         //   juanblanco.solidity
         //   tintinweb.solidity-visual-auditor
         //   tintinweb.solidity-metrics
@@ -32,6 +67,8 @@
         //   ryu1kn.partial-diff
         //   tintinweb.vscode-inline-bookmarks
         //   eamodio.gitlens
+        // includes what is listed above ^
+        "tintinweb.ethereum-security-bundle",
         "tintinweb.vscode-ethover",
         "trailofbits.weaudit",
         "tintinweb.vscode-inline-bookmarks", 
@@ -40,10 +77,8 @@
         "NomicFoundation.hardhat-solidity",
         "Olympixai.olympix",
         "trailofbits.contract-explorer",
-        // this goes with panoramix
-        "tintinweb.vscode-decompiler",
-
-        
+        // dependency for panoramix
+        "tintinweb.vscode-decompiler"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "zsh",
@@ -54,5 +89,5 @@
 // Use 'postCreateCommand' to run commands after the container is created.
 // "postCreateCommand": ""
 // Use 'postAttachCommand' to attach a command after the container is opened.
-  "postAttachCommand": "zsh"
+  // "postAttachCommand": "zsh"
 }
