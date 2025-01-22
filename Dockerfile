@@ -71,6 +71,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && s
 USER root
 ## Install nvm, yarn, npm, pnpm
 RUN curl -o- https://raw.githubusercontent.com/devcontainers/features/main/src/node/install.sh | bash
+RUN chown -R vscode:vscode ${HOME}/.npm
 USER vscode
 
 RUN pnpm install hardhat -g

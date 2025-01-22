@@ -9,20 +9,30 @@
   "build": {
     "dockerfile": "../Dockerfile"
   },
+
+  // In this case this is redundant, because we are using the default user.
+  //"remoteUser": "vscode",
+
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
+    // "ghcr.io/devcontainers/features/docker-in-docker:2": {
+    //   "version": "latest",
+    //   "moby": true
+    // }
   },
 
   // Mount isolation. If you need to extract something from within the container, you can use docker cp, but use it at your own risk. If you want to develop your devcontainer, you should comment this things, otherwise your changes inside the live container won't persist.
   // Disables mounting the host workspace into the container.
-  "workspaceMount": "source=none,target=/workspace,type=volume",
+  "workspaceMount": "type=tmpfs,destination=/workspace",
   // Sets a workspace path entirely isolated within the container
   "workspaceFolder": "/home/vscode/quests",
   "runArgs": [
     // Read only filesystem except for explicitly writable volumes (check mounts)
     // For a dev environment this is more a hussle than a feature.
     // "--read-only",
-
+    "--tmpfs=/tmp:rw,noexec,nosuid,size=512m",
+    "--tmpfs=/var/tmp:rw,noexec,nosuid,size=512m",
+    "--tmpfs=/dev/shm:rw,noexec,nosuid,size=64m",
     // Drop all capabilities
     "--cap-drop=ALL",
 
@@ -35,40 +45,39 @@
 
     // If you really want to isolate it, just disconnect it from the internet. You should COPY your working files inside before, otherwise you'll have to mount them manually.
     // "--network=none",
-    
+    "--network=bridge",
+    "--dns=1.1.1.1",
+    "--dns=1.0.0.1",
+
     // Play a little bit with resources.
     // "--memory=512m",
     // "--cpus=2"
   ],
 
   // Writable mounts in case you want to set --read-only above.
-  // "mounts": [
-  //   "source=tmp-vol,target=/tmp,type=volume",
-  //   "source=home-vscode-vol,target=/home/vscode,type=volume",
-  //   "source=var-vol,target=/var,type=volume",
-  //   "source=run-vol,target=/run,type=volume",
-  //   ],
+  "mounts": [
+    ],
 
 
 // Configure tool-specific properties.
   "customizations": {
   // Configure properties specific to VS Code.
     "vscode": {
+      "settings": {
+        // Killswitch for automated tasks
+        "task.autoDetect": "off",
+        "task.problemMatchers.autoDetect": "off",
+        // Trust no one by default
+        "security.workspace.trust.enabled": false,
+        // Killswitch for telemetry
+        "telemetry.telemetryLevel": "off",
+        // Use zsh by default. Using bash might be more safe and stable.
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": { "zsh": { "path": "/usr/bin/zsh" } }
+      },
       "extensions": [
         // check out https://marketplace.visualstudio.com/items?itemName=tintinweb.ethereum-security-bundle for more information
-        //   juanblanco.solidity
-        //   tintinweb.solidity-visual-auditor
-        //   tintinweb.solidity-metrics
-        //   tintinweb.vscode-solidity-flattener
-        //   tintinweb.vscode-vyper
-        //   tintinweb.vscode-LLL
-        //   streetsidesoftware.code-spell-checker
-        //   gimenete.github-linker
-        //   ryu1kn.partial-diff
-        //   tintinweb.vscode-inline-bookmarks
-        //   eamodio.gitlens
-        // includes what is listed above ^
-        "tintinweb.ethereum-security-bundle",
+        "tintinweb.ethereum-security-bundle", // includes what is listed above ^
         "tintinweb.vscode-ethover",
         "trailofbits.weaudit",
         "tintinweb.vscode-inline-bookmarks", 
@@ -77,15 +86,10 @@
         "NomicFoundation.hardhat-solidity",
         "Olympixai.olympix",
         "trailofbits.contract-explorer",
-        // dependency for panoramix
-        "tintinweb.vscode-decompiler"
-      ],
-      "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh",
-        "terminal.integrated.profiles.linux": { "zsh": { "path": "/usr/bin/zsh" } }
-      }
+        "tintinweb.vscode-decompiler" // dependency for panoramix
+      ]
     }
-  },
+  }
 // Use 'postCreateCommand' to run commands after the container is created.
 // "postCreateCommand": ""
 // Use 'postAttachCommand' to attach a command after the container is opened.
