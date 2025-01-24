@@ -40,11 +40,14 @@
     "--security-opt", "no-new-privileges",
     "--security-opt", "apparmor:docker-default",
 
-    // // Disable SELinux.
-    // "--security-opt", "seccomp=unconfined"
+    // Use seccomp's default 
+    // "--security-opt", "seccomp=default",
 
     // If you really want to isolate it, just disconnect it from the internet. You should COPY your working files inside before, otherwise you'll have to mount them manually.
     // "--network=none",
+    "--sysctl=net.ipv6.conf.all.disable_ipv6=1",  // Disable IPv6
+    "--sysctl=net.ipv6.conf.default.disable_ipv6=1",
+    "--cap-drop=NET_RAW", // Disable raw packets
     "--network=bridge",
     "--dns=1.1.1.1",
     "--dns=1.0.0.1",
