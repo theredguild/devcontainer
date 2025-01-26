@@ -35,11 +35,14 @@ ENV LOCAL_BIN=${HOME}/.local/bin
 ENV PNPM_HOME=${HOME}/.local/share/pnpm
 ENV PATH=${PATH}:${USR_LOCAL_BIN}:${LOCAL_BIN}:${PNPM_HOME}
 
-# Install pipx
-RUN python3 -m pip install --no-cache-dir --upgrade pipx
+# # Install pipx
+# RUN python3 -m pip install --no-cache-dir --upgrade pipx
 
-# Make sure pipx's paths are set
-RUN pipx ensurepath
+# # Make sure pipx's paths are set
+# RUN pipx ensurepath
+
+# Install uv
+RUN python3 -m pip install --no-cache-dir --upgrade uv
 
 # Set asdf manager version
 ENV ASDF_VERSION=v0.15.0
@@ -73,9 +76,9 @@ RUN pnpm install hardhat -g
 
 # Python installations
 # Install slither (through napalm-core), crytic-compile (through napalm-core), solc (through napalm-core), vyper, mythx, panoramix, slider-lsp (needed for contract explorer), napalm-toolbox
-RUN pipx install vyper && \ 
-    pipx install panoramix-decompiler && \ 
-    pipx install solc-select && solc-select install 0.8.10 latest && solc-select use latest
+RUN uv tool install vyper && \ 
+    uv tool install panoramix-decompiler && \ 
+    uv tool install solc-select && solc-select install 0.8.10 latest && solc-select use latest
 
 ## Foundry framework
 RUN curl -fsSL https://foundry.paradigm.xyz | zsh
