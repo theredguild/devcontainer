@@ -27,7 +27,6 @@ WORKDIR /home/vscode
 
 # Set HOME and create quests folder
 ENV HOME=/home/vscode
-RUN mkdir -p ${HOME}/quests && chown vscode:vscode ${HOME}/quests
 
 # Set neded paths (for python, pix, pnpm)
 ENV USR_LOCAL_BIN=/usr/local/bin
@@ -75,26 +74,16 @@ USER vscode
 RUN pnpm install hardhat -g
 
 # Python installations
-# Install slither (through napalm-core), crytic-compile (through napalm-core), solc (through napalm-core), vyper, mythx, panoramix, slider-lsp (needed for contract explorer), napalm-toolbox
+# Install vyper and solc-select
 RUN uv tool install vyper && \ 
-    uv tool install panoramix-decompiler && \ 
-    uv tool install solc-select && solc-select install 0.8.10 latest && solc-select use latest
+    uv tool install solc-select && \
+    solc-select install 0.8.10 latest && \
+    solc-select use latest
 
 ## Foundry framework
 RUN curl -fsSL https://foundry.paradigm.xyz | zsh
 RUN foundryup
 
-## Halmos
-### First installs uv, and then the latest version of halmos and adds it to PATH
-RUN curl -fsSL https://astral.sh/uv/install.sh | bash && \
-    uv tool install halmos
-
-# Clone useful repositories inside quests
-WORKDIR ${HOME}/quests
-RUN git clone --depth 1 https://github.com/crytic/building-secure-contracts.git
-
-# Back to home in case we want to do something later.
-WORKDIR ${HOME}
 
 # Do some things as root
 USER root
@@ -107,10 +96,6 @@ RUN mkdir -p /usr/share/zsh/site-functions && \
 
 ## Clean
 RUN apt-get autoremove -y && apt-get clean -y
-
-## Configure MOTD
-COPY --link --chown=root:root motd /etc/motd
-RUN echo '\ncat /etc/motd\n' >> ~/.zshrc
 
 ## back to user!
 USER vscode

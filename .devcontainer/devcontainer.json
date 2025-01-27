@@ -25,7 +25,7 @@
   // Disables mounting the host workspace into the container.
   "workspaceMount": "type=tmpfs,destination=/workspace",
   // Sets a workspace path entirely isolated within the container
-  "workspaceFolder": "/home/vscode/quests",
+  "workspaceFolder": "/workspace",
   "runArgs": [
     // Read only filesystem except for explicitly writable volumes (check mounts)
     // For a dev environment this is more a hussle than a feature.
@@ -79,17 +79,8 @@
         "terminal.integrated.profiles.linux": { "zsh": { "path": "/usr/bin/zsh" } }
       },
       "extensions": [
-        // check out https://marketplace.visualstudio.com/items?itemName=tintinweb.ethereum-security-bundle for more information
-        "tintinweb.ethereum-security-bundle", // includes what is listed above ^
-        "tintinweb.vscode-ethover",
-        "trailofbits.weaudit",
-        "tintinweb.vscode-inline-bookmarks", 
-        "tintinweb.vscode-solidity-language",
-        "tintinweb.graphviz-interactive-preview",
         "NomicFoundation.hardhat-solidity",
-        "Olympixai.olympix",
-        "trailofbits.contract-explorer",
-        "tintinweb.vscode-decompiler" // dependency for panoramix
+        "tintinweb.solidity-visual-auditor"
       ]
     }
   }
