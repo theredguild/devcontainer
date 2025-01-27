@@ -13,8 +13,7 @@ This is the minimized version of the devcontainer. It has some security features
 to run `sudo`, or escalate privileges. Aditionnaly, we have removed some heavy tooling for it to be
 more lightweight. Feel free to disable as many extensions as you like.
 
-*I also call this version: tincho's cut.*
-matta.
+*I also call this version: tincho's cut. Don't forget to read this [article].(https://blog.theredguild.org/where-do-you-run-your-code-part-ii-2/)*
 
 ## Requirements
 
