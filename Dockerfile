@@ -103,7 +103,7 @@ RUN curl -fsSL https://foundry.paradigm.xyz | zsh
 RUN foundryup
 
 ## Aderyn
-RUN curl -fsSL https://raw.githubusercontent.com/Cyfrin/aderyn/dev/cyfrinup/install | zsh
+RUN curl -fsSL https://raw.githubusercontent.com/Cyfrin/up/main/install | zsh
 RUN cyfrinup
 
 ## Halmos
