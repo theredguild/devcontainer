@@ -21,7 +21,6 @@ jobs:
         subFolder:
           - .devcontainer/auditor
           - .devcontainer/minimal
-          - .devcontainer/legacy
           - .devcontainer/hardened
           - .devcontainer/isolated
     steps:
