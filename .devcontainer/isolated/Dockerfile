@@ -6,7 +6,6 @@
 # with maximum security isolation, read-only filesystem, and network isolation.
 # 
 # Key security features:
-# - Multi-stage build for Echidna binary
 # - Non-root user execution
 # - Minimal package installation
 # - Security-hardened toolchain
