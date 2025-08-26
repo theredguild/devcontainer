@@ -77,8 +77,6 @@
     "no-new-privileges:true",      // Prevent privilege escalation
     "--security-opt",
     "apparmor=docker-default",     // Use Docker's default AppArmor profile
-    "--security-opt",
-    "seccomp=unconfined",         // Disable seccomp for compatibility
     
     // Network isolation - completely disconnect from internet
     "--network=none",
