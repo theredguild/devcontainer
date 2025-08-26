@@ -23,6 +23,7 @@ jobs:
           - .devcontainer/minimal
           - .devcontainer/legacy
           - .devcontainer/hardened
+          - .devcontainer/isolated
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -80,7 +81,7 @@ jobs:
           runCmd: echo "Devcontainer OK in ${{ matrix.subFolder }}" && uname -a
           push: never
 
-      - name: Test Foundry functionality
+      - name: Test Minimal Tools
         if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true'
         uses: devcontainers/ci@v0.3
         with:
@@ -94,6 +95,35 @@ jobs:
             cast --version || echo "❌ Cast not found"
             anvil --version || echo "❌ Anvil not found"
             echo "✅ Foundry tools verification completed"
+          push: never
+
+      - name: Test Auditor Tools
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && contains(fromJSON('[".devcontainer/auditor", ".devcontainer/hardened", ".devcontainer/isolated"]'), matrix.subFolder)
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: ${{ matrix.subFolder }}
+          configFile: ${{ matrix.subFolder }}/devcontainer.json
+          
+          runCmd: |
+            echo "🧪 Testing Auditor tools..."
+            slither --version || echo "❌ Slither not found"
+            myth --version || echo "❌ Mythril not found"
+            echidna --version || echo "❌ Echidna not found"
+            echo "✅ Auditor tools verification completed"
+          push: never
+
+      - name: Test Isolation
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && matrix.subFolder == '.devcontainer/isolated'
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: ${{ matrix.subFolder }}
+          configFile: ${{ matrix.subFolder }}/devcontainer.json
+          
+          runCmd: |
+            echo "🧪 Testing Isolation..."
+            if (touch /test.txt); then echo "❌ Filesystem is not read-only"; exit 1; else echo "✅ Filesystem is read-only"; fi
+            if (curl -sS https://www.google.com); then echo "❌ Network is not isolated"; exit 1; else echo "✅ Network is isolated"; fi
+            echo "✅ Isolation verification completed"
           push: never
 
       - name: Purge Docker cache and resources (on success)
