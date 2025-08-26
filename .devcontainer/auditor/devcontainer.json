@@ -1,0 +1,58 @@
+{
+    // For format details, see https://aka.ms/devcontainer.json.
+    // This is the AUDITOR version of TRG's DevContainer - specialized for smart contract auditing
+    // with Docker-in-Docker support, specialized audit extensions, and focused tooling for
+    // comprehensive security analysis and code review.
+    "name": "Auditor TRG's DevContainer",
+    
+    // Build configuration - uses the local Dockerfile in this directory
+    "build": {
+        "dockerfile": "./Dockerfile"
+    },
+    
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    // Specialized features for auditing and development workflows
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},           // Git version control support
+        "ghcr.io/devcontainers/features/github-cli:1": {},    // GitHub CLI for repository management
+        "ghcr.io/devcontainers/features/docker-in-docker:2.12.2": {  // Docker-in-Docker for containerized tools
+            "version": "latest",                              // Use latest stable version
+            "enableNonRootDocker": "true"                     // Enable non-root Docker for security
+        }
+    },
+    
+    // Configure tool-specific properties for VS Code
+    "customizations": {
+        "vscode": {
+            // Specialized extensions for smart contract auditing and development
+            "extensions": [ 
+                "NomicFoundation.hardhat-solidity",           // Hardhat Solidity support
+                "tintinweb.solidity-visual-auditor",          // Visual auditor for Solidity contracts
+                "tintinweb.solidity-metrics",                 // Code metrics and analysis
+                "trailofbits.weaudit",                        // Trail of Bits audit tools
+                "eamodio.gitlens",                            // Enhanced Git integration
+                "streetsidesoftware.code-spell-checker",      // Code spelling and grammar
+                "ms-vscode.vscode-json",                      // JSON language support
+                "tintinweb.chonky"                            // File explorer enhancements
+            ],
+            // VS Code settings optimized for auditing workflows
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",  // Use bash for compatibility
+                "solidity-va.hover": true,                          // Enable Solidity hover information
+                "solidity-va.diagnostics": true                     // Enable Solidity diagnostics
+            }
+        }
+    },
+    
+    // Use vscode user for security (non-root execution)
+    "remoteUser": "vscode",
+    
+    // Mount configuration for workspace access
+    // Bind mount from host for persistent development
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+    ],
+    
+    // Workspace configuration - mounted from host
+    "workspaceFolder": "/workspace"
+}

@@ -1,0 +1,95 @@
+{
+  // For format details, see https://aka.ms/devcontainer.json.
+  // This is the HARDENED version of TRG's DevContainer - provides enhanced security
+  // with capability dropping, security options, and resource limits while maintaining
+  // network connectivity for development.
+  "name": "Hardened TRG's DevContainer",
+  
+  // Build configuration - uses the local Dockerfile in this directory
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  
+  // Use vscode user for security (non-root execution)
+  "remoteUser": "vscode",
+  
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // Git and GitHub CLI features for version control and GitHub integration
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  
+  // Container environment variables
+  "containerEnv": {
+    "SHELL": "/bin/zsh",  // Use zsh as the default shell
+    "DEVCONTAINER_ID_LABEL": "hardened-web3-devcontainer"  // Label for container identification
+  },
+  
+  // Configure tool-specific properties for VS Code
+  "customizations": {
+    "vscode": {
+      // Web3 security and development extensions
+      "extensions": [
+        "tintinweb.ethereum-security-bundle",  // Comprehensive Ethereum security tools
+        "tintinweb.vscode-ethover",           // Ethereum hover information
+        "trailofbits.weaudit",                // Trail of Bits audit tools
+        "tintinweb.vscode-inline-bookmarks",  // Inline code bookmarks
+        "tintinweb.vscode-solidity-language", // Solidity language support
+        "tintinweb.graphviz-interactive-preview", // Graph visualization
+        "trailofbits.contract-explorer",      // Smart contract exploration
+        "tintinweb.vscode-decompiler"        // Contract decompilation
+      ],
+      // VS Code settings for security and functionality
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",  // Default terminal shell
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh"
+          }
+        },
+        "task.autoDetect": "off",              // Disable automatic task detection for security
+        "task.allowAutomaticTasks": "off",     // Prevent automatic task execution
+        "security.workspace.trust.enabled": false,  // Disable workspace trust by default
+        "telemetry.telemetryLevel": "off"      // Disable telemetry collection
+      }
+    }
+  },
+  
+  // Commands to run during container lifecycle
+  "initializeCommand": "echo 'Initializing hardened dev container...'",
+  "postStartCommand": "echo '🚀 Dev container is ready for Web3 development!'",
+  
+  // Workspace configuration - mounted from host with caching
+  "workspaceFolder": "/workspace",
+  // Mount workspace from host with consistency caching for performance
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  
+  // Docker run arguments for security hardening
+  "runArgs": [
+    // Security hardening - drop all Linux capabilities
+    "--cap-drop=ALL",
+    
+    // Security options for container isolation
+    "--security-opt",
+    "no-new-privileges:true",      // Prevent privilege escalation
+    "--security-opt",
+    "apparmor=docker-default",     // Use Docker's default AppArmor profile
+    "--security-opt",
+    "seccomp=unconfined",         // Disable seccomp for compatibility
+    
+    // DNS configuration for security and reliability
+    "--dns=1.1.1.1",              // Use Cloudflare's secure DNS
+    "--dns=1.0.0.1",              // Secondary DNS for redundancy
+    
+    // Temporary filesystem mounts with security restrictions
+    "--tmpfs",
+    "/tmp:rw,noexec,nosuid,size=512m",      // Temporary directory with size limit
+    "--tmpfs",
+    "/var/tmp:rw,noexec,nosuid,size=512m",  // System temp directory with size limit
+    
+    // Resource limits for container performance and security
+    "--memory=1024m",              // Limit memory to 1GB
+    "--cpus=2"                     // Limit to 2 CPU cores
+  ]
+}

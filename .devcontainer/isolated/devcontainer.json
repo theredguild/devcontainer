@@ -1,0 +1,117 @@
+{
+  // For format details, see https://aka.ms/devcontainer.json.
+  // This is the ISOLATED version of TRG's DevContainer - provides maximum security isolation
+  // with a read-only filesystem and network isolation for high-security Web3 development.
+  "name": "Isolated TRG's DevContainer",
+  
+  // Build configuration - uses the local Dockerfile in this directory
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  
+  // Use vscode user for security (non-root execution)
+  "remoteUser": "vscode",
+  
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // Git and GitHub CLI features for version control and GitHub integration
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  
+  // Container environment variables
+  "containerEnv": {
+    "SHELL": "/bin/zsh",  // Use zsh as the default shell
+    "DEVCONTAINER_ID_LABEL": "isolated-web3-devcontainer"  // Label for container identification
+  },
+  
+  // Configure tool-specific properties for VS Code
+  "customizations": {
+    "vscode": {
+      // Web3 security and development extensions
+      "extensions": [
+        "tintinweb.ethereum-security-bundle",  // Comprehensive Ethereum security tools
+        "tintinweb.vscode-ethover",           // Ethereum hover information
+        "trailofbits.weaudit",                // Trail of Bits audit tools
+        "tintinweb.vscode-inline-bookmarks",  // Inline code bookmarks
+        "tintinweb.vscode-solidity-language", // Solidity language support
+        "tintinweb.graphviz-interactive-preview", // Graph visualization
+        "trailofbits.contract-explorer",      // Smart contract exploration
+        "tintinweb.vscode-decompiler"        // Contract decompilation
+      ],
+      // VS Code settings for security and functionality
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",  // Default terminal shell
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh"
+          }
+        },
+        "task.autoDetect": "off",              // Disable automatic task detection for security
+        "task.allowAutomaticTasks": "off",     // Prevent automatic task execution
+        "security.workspace.trust.enabled": false,  // Disable workspace trust by default
+        "telemetry.telemetryLevel": "off"      // Disable telemetry collection
+      }
+    }
+  },
+  
+  // Commands to run during container lifecycle
+  "initializeCommand": "echo 'Initializing isolated dev container...'",
+  "postStartCommand": "echo '🚀 Dev container is ready for Web3 development!'",
+  
+  // Workspace configuration - isolated within container
+  "workspaceFolder": "/workspace",
+  // Mount workspace as tmpfs for complete isolation - no host file access
+  "workspaceMount": "type=tmpfs,destination=/workspace,tmpfs-mode=1777",
+  
+  // Docker run arguments for security and isolation
+  "runArgs": [
+    // Security hardening - drop all Linux capabilities
+    "--cap-drop=ALL",
+    
+    // Read-only filesystem for maximum security
+    "--read-only",
+    
+    // Security options for container isolation
+    "--security-opt",
+    "no-new-privileges:true",      // Prevent privilege escalation
+    "--security-opt",
+    "apparmor=docker-default",     // Use Docker's default AppArmor profile
+    "--security-opt",
+    "seccomp=unconfined",         // Disable seccomp for compatibility
+    
+    // Network isolation - completely disconnect from internet
+    "--network=none",
+    
+    // Essential writable tmpfs mounts for VS Code functionality
+    // These are required for VS Code Server to work properly
+    "--tmpfs",
+    "/home/vscode/.vscode-server:rw,noexec,nosuid,size=512m,uid=1000,gid=1000",
+    "--tmpfs",
+    "/home/vscode/.vscode-server-insiders:rw,noexec,nosuid,size=256m,uid=1000,gid=1000",
+    "--tmpfs",
+    "/home/vscode/.cache:rw,noexec,nosuid,size=256m,uid=1000,gid=1000",
+    "--tmpfs",
+    "/home/vscode/.config:rw,noexec,nosuid,size=128m,uid=1000,gid=1000",
+    "--tmpfs",
+    "/home/vscode/.local:rw,noexec,nosuid,size=256m,uid=1000,gid=1000",
+    
+    // System temporary directories with size limits
+    "--tmpfs",
+    "/tmp:rw,noexec,nosuid,size=512m",
+    "--tmpfs",
+    "/var/tmp:rw,noexec,nosuid,size=512m",
+    "--tmpfs",
+    "/var/log:rw,noexec,nosuid,size=128m",
+    "--tmpfs",
+    "/run:rw,noexec,nosuid,size=128m",
+    
+    // Git configuration storage
+    "--tmpfs",
+    "/home/vscode/.gitconfig:rw,noexec,nosuid,size=1m,uid=1000,gid=1000",
+    
+    // Resource limits for container performance
+    "--memory=1g",    // Limit memory to 1GB
+    "--cpus=2"        // Limit to 2 CPU cores
+  ]
+}

@@ -9,7 +9,69 @@ install the most popular tools, so they can all work seamlessly, and at the same
 by default. If you want to know more, and really want to take advante of this devcontainer read
 below.
 
-There's also a minimized version under the `minimal` branch.
+## Available Devcontainer Variants
+
+We now offer multiple devcontainer configurations to suit different security and development needs:
+
+### **Isolated** (`.devcontainer/isolated/`)
+**Best for**: Maximum security isolation, air-gapped environments
+- **Focus**: Complete isolation with read-only filesystem and network isolation
+- **Includes**: All security tools, fuzzing tools (Echidna, Medusa), static analysis
+- **Security**: Read-only filesystem, network isolation, capability dropping, tmpfs mounts
+- **Extensions**: Comprehensive Ethereum security bundle, audit tools, decompilers
+- **Use case**: High-security research and isolated analysis
+
+### **Hardened** (`.devcontainer/hardened/`)
+**Best for**: Enhanced security with development flexibility
+- **Focus**: Security hardening with maintained network connectivity
+- **Includes**: Core security tools, Foundry, Hardhat, reduced tool set for security focus
+- **Security**: Capability dropping, security options, resource limits, DNS hardening
+- **Extensions**: Essential security extensions, development tools
+- **Use case**: Secure development, security-focused research, balanced security/functionality
+
+### **Auditor** (`.devcontainer/auditor/`)
+**Best for**: Smart contract auditors and security researchers
+- **Focus**: Specialized audit tooling and Docker-in-Docker support
+- **Includes**: Slither, Mythril, Crytic-compile, Foundry, Hardhat, Echidna
+- **Features**: Docker-in-Docker, specialized audit extensions, focused toolchain
+- **Extensions**: Solidity visual auditor, metrics, audit tools, GitLens
+- **Use case**: Comprehensive smart contract audits, security analysis, research workflows
+
+### **Minimal** (`.devcontainer/minimal/`)
+**Best for**: Essential development with basic security
+- **Focus**: Core tools only, streamlined development environment
+- **Includes**: Foundry, Hardhat, basic Solidity support, essential Python tools
+- **Security**: Basic hardening, capability dropping, IPv6 disabled
+- **Extensions**: Core development extensions only
+- **Use case**: Quick prototyping, learning, basic development, resource-constrained environments
+
+### **Legacy** (`.devcontainer/legacy/`)
+**Best for**: Complete toolchain with all features (original experience)
+- **Focus**: Full-featured development environment with comprehensive security tools
+- **Includes**: Complete tool suite, all security tools, fuzzing tools, analysis tools
+- **Security**: Comprehensive hardening, isolation features, security options
+- **Extensions**: Full extension suite, all security and development tools
+- **Use case**: Comprehensive development, learning, full-stack projects, research
+
+## Project Structure
+
+The project supports multiple devcontainer configurations for different use cases:
+
+```
+.devcontainer/
+├── isolated/          # Maximum security isolation
+├── hardened/          # Enhanced security with flexibility
+├── auditor/           # Specialized audit environment
+├── minimal/           # Essential tools only
+└── legacy/            # Complete toolchain (original)
+```
+
+## Quick Start
+
+1. **Choose your variant** based on your needs (see above)
+2. **Navigate to the variant directory**: `cd .devcontainer/[variant-name]`
+3. **Open in VS Code**: `code .`
+4. **Reopen in Container**: Select the appropriate devcontainer when prompted
 
 ## Requirements
 
@@ -19,15 +81,19 @@ There's also a minimized version under the `minimal` branch.
 
 ## Kick-off
 
-1. Start the docker service, and make sure your user is in the `docker` group. Otherwise, add
+1. **Start the docker service**, and make sure your user is in the `docker` group. Otherwise, add
 yourself to it but you'll have to log in back again.
-2. Clone this repo, if you want a minimal version checkout `minimal`.
-3. Open the folder with **vscode** how you like. Running `code .` works well.
-4. Select **Reopen in Container** and wait. This will build the container volume.
-5. If this is your first time, you'll be prompted to press enter on a console log that triggers the
-terminal.
-6. If not you can go to the extensions section on your side, click the **Remote Explorer** tab and
-select the active devcontainer.
+2. **Clone this repo** and navigate to your preferred devcontainer variant:
+   ```bash
+   git clone <this-repo>
+   cd .devcontainer/[auditor|minimal|legacy-theredguild|legacy-minimal]
+   ```
+3. **Open the variant folder with VS Code**: Running `code .` works well.
+4. **Select "Reopen in Container"** and wait. This will build the container volume.
+5. **First time setup**: If this is your first time, you'll be prompted to press enter on a console log that triggers the terminal.
+6. **Subsequent uses**: Go to the extensions section, click the **Remote Explorer** tab and select the active devcontainer.
+
+> **Pro Tip**: Each variant has its own configuration, so you can switch between them by opening different variant folders in VS Code.
 
 ## Usage
 
@@ -39,6 +105,8 @@ can access several features:
 - You can even clone a new repository in a new volume based on the same devcontainer.
 
 ## Features Overview
+
+> **Note**: The features listed below are primarily for the **Legacy The Red Guild** variant. Each variant has its own tailored set of features. Check the specific variant's configuration for details.
 
 ### Extensions
 
@@ -268,6 +336,28 @@ Currently semgrep supports [Solidity](https://semgrep.dev/docs/language-support/
   $ semgrep --config p/smart-contracts path/to/your/project
   ```
 
+## Contributing
+
+### Adding New Variants
+
+To add a new devcontainer variant:
+
+1. **Create a new directory** in `.devcontainer/`
+2. **Add your configuration files**:
+   - `Dockerfile` (if custom build needed)
+   - `devcontainer.json` (required)
+   - Any additional configuration files
+3. **Update the CI workflow** in `.github/workflows/main.yml` to include your variant
+4. **Test locally** before submitting a PR
+5. **Update this README** to document your new variant
+
+### Structure Guidelines
+
+- **Naming**: Use descriptive, lowercase names (e.g., `auditor`, `minimal`)
+- **Configuration**: Keep variants focused on specific use cases
+- **Documentation**: Document what each variant is best for
+- **Testing**: Ensure your variant passes CI/CD checks
+
 ## How to audit your Dockerfile
 
 ```bash
@@ -310,14 +400,12 @@ asdf plugin list all
 ```
 
 Golang: `asdf plugin add golang`
-Python: `asdf plugin add python`
 Node.js: `asdf plugin add nodejs`
 
 #### You can list and install specific versions
 
 ```bash
 asdf install golang 1.20.5
-asdf install python 3.11.5
 asdf install nodejs 18.15.0
 ```
 
@@ -325,15 +413,87 @@ asdf install nodejs 18.15.0
 
 ```bash
 asdf global golang 1.20.5
-asdf global python 3.11.5
 ```
 
 #### Make a version be used locally
 
 ```bash
 asdf local golang 1.19.2
-asdf local python 3.10.4
 ```
+
+### Introduction to `uv`
+
+`uv` is a fast Python package installer and resolver, written in Rust. It's designed to be a drop-in replacement for pip, pip-tools, and virtualenv, offering significantly faster performance and better dependency resolution. It's especially useful for Python projects requiring fast package management and reliable dependency resolution.
+
+#### Install Python versions
+
+Install and manage multiple Python versions:
+
+```bash
+# Install a specific Python version
+uv python install 3.11.5
+uv python install 3.12.0
+
+# List installed Python versions
+uv python list
+
+# Use a specific Python version
+uv python use 3.11.5
+```
+
+#### Create and manage virtual environments
+
+```bash
+# Create a new virtual environment
+uv venv
+
+# Create a virtual environment with a specific Python version
+uv venv --python 3.11.5
+
+# Activate the virtual environment
+source .venv/bin/activate  # On Unix/macOS
+# or
+.venv\Scripts\activate     # On Windows
+```
+
+#### Install packages
+
+```bash
+# Install a single package
+uv add requests
+
+# Install packages with specific versions
+uv add "fastapi>=0.100.0" "uvicorn[standard]"
+
+# Install development dependencies
+uv add --dev pytest black flake8
+
+# Install from requirements.txt
+uv pip install -r requirements.txt
+
+# Install tools globally (similar to pipx)
+uv tool install black
+uv tool install flake8
+uv tool install mypy
+```
+
+#### Project management
+
+```bash
+# Initialize a new Python project
+uv init my-project
+cd my-project
+
+# Add dependencies to pyproject.toml
+uv add requests fastapi
+
+# Install all project dependencies
+uv sync
+
+# Generate requirements.txt
+uv export --format requirements-txt > requirements.txt
+```
+
 
 ### Install different node versions with nvm
 
