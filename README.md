@@ -19,7 +19,7 @@ We now offer multiple devcontainer configurations to suit different security and
 - **Includes**: All security tools, fuzzing tools (Echidna, Medusa), static analysis
 - **Security**: Read-only filesystem, network isolation, capability dropping, tmpfs mounts
 - **Extensions**: Comprehensive Ethereum security bundle, audit tools, decompilers
-- **Use case**: High-security research, compliance requirements, isolated analysis
+- **Use case**: High-security research and isolated analysis
 
 ### **Hardened** (`.devcontainer/hardened/`)
 **Best for**: Enhanced security with development flexibility
