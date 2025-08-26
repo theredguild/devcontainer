@@ -400,14 +400,12 @@ asdf plugin list all
 ```
 
 Golang: `asdf plugin add golang`
-Python: `asdf plugin add python`
 Node.js: `asdf plugin add nodejs`
 
 #### You can list and install specific versions
 
 ```bash
 asdf install golang 1.20.5
-asdf install python 3.11.5
 asdf install nodejs 18.15.0
 ```
 
@@ -415,15 +413,87 @@ asdf install nodejs 18.15.0
 
 ```bash
 asdf global golang 1.20.5
-asdf global python 3.11.5
 ```
 
 #### Make a version be used locally
 
 ```bash
 asdf local golang 1.19.2
-asdf local python 3.10.4
 ```
+
+### Introduction to `uv`
+
+`uv` is a fast Python package installer and resolver, written in Rust. It's designed to be a drop-in replacement for pip, pip-tools, and virtualenv, offering significantly faster performance and better dependency resolution. It's especially useful for Python projects requiring fast package management and reliable dependency resolution.
+
+#### Install Python versions
+
+Install and manage multiple Python versions:
+
+```bash
+# Install a specific Python version
+uv python install 3.11.5
+uv python install 3.12.0
+
+# List installed Python versions
+uv python list
+
+# Use a specific Python version
+uv python use 3.11.5
+```
+
+#### Create and manage virtual environments
+
+```bash
+# Create a new virtual environment
+uv venv
+
+# Create a virtual environment with a specific Python version
+uv venv --python 3.11.5
+
+# Activate the virtual environment
+source .venv/bin/activate  # On Unix/macOS
+# or
+.venv\Scripts\activate     # On Windows
+```
+
+#### Install packages
+
+```bash
+# Install a single package
+uv add requests
+
+# Install packages with specific versions
+uv add "fastapi>=0.100.0" "uvicorn[standard]"
+
+# Install development dependencies
+uv add --dev pytest black flake8
+
+# Install from requirements.txt
+uv pip install -r requirements.txt
+
+# Install tools globally (similar to pipx)
+uv tool install black
+uv tool install flake8
+uv tool install mypy
+```
+
+#### Project management
+
+```bash
+# Initialize a new Python project
+uv init my-project
+cd my-project
+
+# Add dependencies to pyproject.toml
+uv add requests fastapi
+
+# Install all project dependencies
+uv sync
+
+# Generate requirements.txt
+uv export --format requirements-txt > requirements.txt
+```
+
 
 ### Install different node versions with nvm
 

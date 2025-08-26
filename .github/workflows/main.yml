@@ -21,8 +21,8 @@ jobs:
         subFolder:
           - .devcontainer/auditor
           - .devcontainer/minimal
-          - .devcontainer/legacy-theredguild
-          - .devcontainer/legacy-minimal
+          - .devcontainer/legacy
+          - .devcontainer/hardened
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

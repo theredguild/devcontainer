@@ -16,9 +16,9 @@
 # Echidna is a fuzzing tool for Ethereum smart contracts
 FROM --platform=linux/amd64 ghcr.io/crytic/echidna/echidna:latest AS echidna
 
-# Base image: Debian 12 (Bookworm) with VS Code DevContainer support
+# Base image: Latest Debian with VS Code DevContainer support
 # This provides a stable, security-focused base for development
-FROM mcr.microsoft.com/vscode/devcontainers/base:bookworm
+FROM mcr.microsoft.com/vscode/devcontainers/base:debian
 
 # Install essential system packages for development
 # These are the minimal packages needed for Web3 development tools
@@ -51,20 +51,19 @@ USER vscode
 WORKDIR /home/vscode
 ENV HOME=/home/vscode
 
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Update PATH environment for tool access
 # Configure paths for Python, Node.js, and other tools
+ENV UV_LOCAL_BIN=$HOME/.cargo/bin
 ENV USR_LOCAL_BIN=/usr/local/bin
 ENV LOCAL_BIN=${HOME}/.local/bin
 ENV PNPM_HOME=${HOME}/.local/share/pnpm
-ENV PATH=${PATH}:${USR_LOCAL_BIN}:${LOCAL_BIN}:${PNPM_HOME}
+ENV PATH=${PATH}:${USR_LOCAL_BIN}:${LOCAL_BIN}:${PNPM_HOME}:${UV_LOCAL_BIN}
 
-# Configure pip to allow system packages in container environment
-# This is necessary for some tools that need system-level packages
-ENV PIP_BREAK_SYSTEM_PACKAGES=1
-
-# Install uv package manager - modern Python package manager
-# Faster and more reliable than pip for tool installation
-RUN python3 -m pip install --no-cache-dir --upgrade uv
+# Install Python 3.12 with uv
+RUN uv python install 3.12
 
 # Set the default shell execution for subsequent RUN commands
 # Use zsh for better shell features and compatibility
@@ -102,18 +101,14 @@ USER vscode
 ENV PNPM_HOME=${HOME}/.local/share/pnpm
 ENV PATH=${PATH}:${PNPM_HOME}
 
-# Install Python-based security analysis tools
-# These tools provide comprehensive smart contract security analysis
-# Install slither, crytic-compile, solc, vyper, mythx, panoramix, slider-lsp (needed for contract explorer), napalm-toolbox. napalm-core has to be installed manually.
+# Install Python-based security analysis tools (reduced set for security focus)
+# These tools provide essential smart contract security analysis
+# Focused on core tools: slither, mythril, crytic-compile, halmos, solc-select
 RUN uv tool install slither-analyzer && \ 
     uv tool install crytic-compile && \ 
-    uv tool install vyper && \ 
-    uv tool install panoramix-decompiler && \ 
     uv tool install slither-lsp && \ 
     uv tool install mythril && \ 
-    uv tool install napalm-toolbox && \ 
-    uv tool install semgrep && \ 
-    uv tool install slitherin && \ 
+    uv tool install halmos && \ 
     uv tool install solc-select && \
     solc-select install 0.4.26 0.5.17 0.6.12 0.7.6 0.8.10 latest && solc-select use latest
 

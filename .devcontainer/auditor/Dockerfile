@@ -23,15 +23,32 @@ FROM mcr.microsoft.com/vscode/devcontainers/base:bookworm
 # Switch to root user temporarily for system package installation
 USER root
 
-# Install essential system packages for development and auditing
-# These packages provide the foundation for all development tools
-RUN apt-get update -y && apt-get install -y \
-    zsh python3-pip python3-venv python3-dev libpython3-dev build-essential vim curl git sudo pkg-config \
-    --no-install-recommends
+# Install essential system packages for development
+# These are the minimal packages needed for Web3 development tools
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    bash-completion       # Shell completion support \
+    build-essential       # Compilation tools (gcc, make, etc.) \
+    curl                  # HTTP client for downloading tools \
+    git                   # Version control system \
+    jq                    # JSON processor for tool outputs \
+    pkg-config            # Package configuration helper \
+    sudo                  # Privilege escalation (needed for some tools) \
+    unzip                 # Archive extraction \
+    vim                   # Text editor \
+    wget                  # Alternative HTTP client \
+    zsh                   # Advanced shell \
+    && rm -rf /var/lib/apt/lists/*
 
-# The base container usually has a "vscode" user. If not, create one here.
-# This ensures consistent user setup across different base images
-RUN echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+    
+# Install Python development dependencies
+# Required for Python-based security tools and package management
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    python3-pip          # Python package installer \
+    libpython3-dev       # Python development headers \
+    python3-dev          # Python development tools \
+    python3-venv         # Python virtual environment support \
+    && rm -rf /var/lib/apt/lists/*
 
 # Switch to vscode user for security (drop privileges)
 # This ensures all subsequent operations run as non-root user
@@ -39,20 +56,19 @@ USER vscode
 WORKDIR /home/vscode
 ENV HOME=/home/vscode
 
-# Set needed paths for Python, pnpm, and other tools
-# Configure environment variables for tool access and package management
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Update PATH environment for tool access
+# Configure paths for Python, Node.js, and other tools
+ENV UV_LOCAL_BIN=$HOME/.cargo/bin
 ENV USR_LOCAL_BIN=/usr/local/bin
 ENV LOCAL_BIN=${HOME}/.local/bin
 ENV PNPM_HOME=${HOME}/.local/share/pnpm
-ENV PATH=${PATH}:${USR_LOCAL_BIN}:${LOCAL_BIN}:${PNPM_HOME}
+ENV PATH=${PATH}:${USR_LOCAL_BIN}:${LOCAL_BIN}:${PNPM_HOME}:${UV_LOCAL_BIN}
 
-# Configure pip to allow system packages in container environment
-# This is necessary for some tools that need system-level packages
-ENV PIP_BREAK_SYSTEM_PACKAGES=1
-
-# Install uv package manager - modern Python package manager
-# Faster and more reliable than pip for tool installation
-RUN python3 -m pip install --no-cache-dir --upgrade uv
+# Install Python 3.12 with uv
+RUN uv python install 3.12
 
 # Set the default shell to zsh for better development experience
 ENV SHELL=/usr/bin/zsh
