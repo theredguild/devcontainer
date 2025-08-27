@@ -26,33 +26,69 @@
         "vscode": {
             // Specialized extensions for smart contract auditing and development
             "extensions": [ 
-                "NomicFoundation.hardhat-solidity",           // Hardhat Solidity support
-                "tintinweb.solidity-visual-auditor",          // Visual auditor for Solidity contracts
-                "tintinweb.solidity-metrics",                 // Code metrics and analysis
-                "trailofbits.weaudit",                        // Trail of Bits audit tools
-                "eamodio.gitlens",                            // Enhanced Git integration
-                "streetsidesoftware.code-spell-checker",      // Code spelling and grammar
-                "ms-vscode.vscode-json",                      // JSON language support
-                "tintinweb.chonky"                            // File explorer enhancements
+                // check out https://marketplace.visualstudio.com/items?itemName=tintinweb.ethereum-security-bundle for more information
+                "tintinweb.ethereum-security-bundle", // includes what is listed above ^
+                "tintinweb.vscode-ethover",
+                "trailofbits.weaudit",
+                "tintinweb.vscode-inline-bookmarks", 
+                "tintinweb.vscode-solidity-language",
+                "tintinweb.graphviz-interactive-preview",
+                "NomicFoundation.hardhat-solidity",
+                "Olympixai.olympix",
+                "trailofbits.contract-explorer",
+                "tintinweb.chonky"                            // Chonky Agent
             ],
             // VS Code settings optimized for auditing workflows
             "settings": {
-                "terminal.integrated.defaultProfile.linux": "bash",  // Use bash for compatibility
-                "solidity-va.hover": true,                          // Enable Solidity hover information
-                "solidity-va.diagnostics": true                     // Enable Solidity diagnostics
-            }
+                    // Security settings - killswitch for automated tasks
+                    "task.autoDetect": "off",                    // Disable automatic task detection
+                    "task.problemMatchers.autoDetect": "off",    // Disable automatic problem matchers
+                    
+                    // Trust and security configuration
+                    "security.workspace.trust.enabled": false,   // Trust no one by default
+                    
+                    // Privacy settings - killswitch for telemetry
+                    "telemetry.telemetryLevel": "off",           // Disable all telemetry collection
+                    
+                    // Terminal configuration
+                    "terminal.integrated.defaultProfile.linux": "zsh",  // Use zsh by default
+                    "terminal.integrated.profiles.linux": { "zsh": { "path": "/usr/bin/zsh" } }
+                    // Using bash might be more safe and stable, but zsh provides better features
+                    },
         }
     },
     
-    // Use vscode user for security (non-root execution)
-    "remoteUser": "vscode",
+    // Mount isolation configuration for security and development workflow
+    // If you need to extract something from within the container, you can use docker cp, but use it at your own risk. 
+    // If you want to develop your devcontainer, you should comment this things, otherwise your changes inside the live container won't persist.
+    // Disables mounting the host workspace into the container for isolation.
+    "workspaceMount": "type=tmpfs,destination=/workspace",
+    // Sets a workspace path entirely isolated within the container
+    "workspaceFolder": "/workspace",
     
-    // Mount configuration for workspace access
-    // Bind mount from host for persistent development
-    "mounts": [
-        "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+    // Docker run arguments for security hardening and resource management
+    "runArgs": [
+      
+      // IPv6 security - disable IPv6 to reduce attack surface
+      "--sysctl=net.ipv6.conf.all.disable_ipv6=1",    // Disable IPv6 globally
+      "--sysctl=net.ipv6.conf.default.disable_ipv6=1", // Disable IPv6 by default
+      
+      // Network capability restrictions
+      "--cap-drop=NET_RAW",                            // Disable raw packet access
+      "--network=bridge",                              // Use bridge networking
+      
+      // DNS configuration for security and reliability
+      "--dns=1.1.1.1",                                // Primary DNS (Cloudflare)
+      "--dns=1.0.0.1",                                // Secondary DNS (Cloudflare)
+  
+      // Resource limits for container performance and security
+      // Play a little bit with resources to prevent resource exhaustion
+      // "--memory=512m",                              // Memory limit (commented out)
+      // "--cpus=2"                                    // CPU limit (commented out)
     ],
-    
-    // Workspace configuration - mounted from host
-    "workspaceFolder": "/workspace"
+  
+    // Writable mounts in case you want to set --read-only above.
+    // Currently no additional mounts are configured
+    "mounts": [
+      ]
 }

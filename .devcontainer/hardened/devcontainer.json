@@ -42,17 +42,21 @@
       ],
       // VS Code settings for security and functionality
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh",  // Default terminal shell
-        "terminal.integrated.profiles.linux": {
-          "zsh": {
-            "path": "/bin/zsh"
-          }
+          // Security settings - killswitch for automated tasks
+          "task.autoDetect": "off",                    // Disable automatic task detection
+          "task.problemMatchers.autoDetect": "off",    // Disable automatic problem matchers
+          
+          // Trust and security configuration
+          "security.workspace.trust.enabled": false,   // Trust no one by default
+          
+          // Privacy settings - killswitch for telemetry
+          "telemetry.telemetryLevel": "off",           // Disable all telemetry collection
+          
+          // Terminal configuration
+          "terminal.integrated.defaultProfile.linux": "zsh",  // Use zsh by default
+          "terminal.integrated.profiles.linux": { "zsh": { "path": "/usr/bin/zsh" } }
+          // Using bash might be more safe and stable, but zsh provides better features
         },
-        "task.autoDetect": "off",              // Disable automatic task detection for security
-        "task.allowAutomaticTasks": "off",     // Prevent automatic task execution
-        "security.workspace.trust.enabled": false,  // Disable workspace trust by default
-        "telemetry.telemetryLevel": "off"      // Disable telemetry collection
-      }
     }
   },
   
@@ -60,34 +64,62 @@
   "initializeCommand": "echo 'Initializing hardened dev container...'",
   "postStartCommand": "echo '🚀 Dev container is ready for Web3 development!'",
   
-  // Workspace configuration - mounted from host with caching
-  "workspaceFolder": "/workspace",
-  // Mount workspace from host with consistency caching for performance
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+    // Mount isolation configuration for security and development workflow
+    // If you need to extract something from within the container, you can use docker cp, but use it at your own risk. 
+    // If you want to develop your devcontainer, you should comment this things, otherwise your changes inside the live container won't persist.
+    // Disables mounting the host workspace into the container for isolation.
+    "workspaceMount": "type=tmpfs,destination=/workspace",
+    // Sets a workspace path entirely isolated within the container
+    "workspaceFolder": "/workspace",
+    
+    // Docker run arguments for security hardening and resource management
+    "runArgs": [
+
+      // Temporary filesystem mounts with security restrictions
+      // These provide isolated, size-limited temporary storage
+      "--tmpfs=/tmp:rw,noexec,nosuid,size=512m",      // Main temporary directory
+      "--tmpfs=/var/tmp:rw,noexec,nosuid,size=512m",  // System temporary directory
+      "--tmpfs=/dev/shm:rw,noexec,nosuid,size=64m",   // Shared memory directory
+      
+      // Security hardening - drop all Linux capabilities
+      // This reduces the attack surface by removing unnecessary privileges
+      "--cap-drop=ALL",
   
-  // Docker run arguments for security hardening
-  "runArgs": [
-    // Security hardening - drop all Linux capabilities
-    "--cap-drop=ALL",
-    
-    // Security options for container isolation
-    "--security-opt",
-    "no-new-privileges:true",      // Prevent privilege escalation
-    "--security-opt",
-    "apparmor=docker-default",     // Use Docker's default AppArmor profile
-    
-    // DNS configuration for security and reliability
-    "--dns=1.1.1.1",              // Use Cloudflare's secure DNS
-    "--dns=1.0.0.1",              // Secondary DNS for redundancy
-    
-    // Temporary filesystem mounts with security restrictions
-    "--tmpfs",
-    "/tmp:rw,noexec,nosuid,size=512m",      // Temporary directory with size limit
-    "--tmpfs",
-    "/var/tmp:rw,noexec,nosuid,size=512m",  // System temp directory with size limit
-    
-    // Resource limits for container performance and security
-    "--memory=1024m",              // Limit memory to 1GB
-    "--cpus=2"                     // Limit to 2 CPU cores
-  ]
+      // Security options for container isolation
+      // A few security additions (AppArmor & no new privileges)
+      "--security-opt", "no-new-privileges",           // Prevent privilege escalation
+      "--security-opt", "apparmor:docker-default",     // Use Docker's default AppArmor profile
+  
+      // Use seccomp's default security profile
+      // seccomp provides system call filtering for additional security
+      // "--security-opt", "seccomp=default",
+  
+      // Network security configuration
+      // If you really want to isolate it, just disconnect it from the internet. 
+      // You should COPY your working files inside before, otherwise you'll have to mount them manually.
+      // "--network=none",
+      
+      // IPv6 security - disable IPv6 to reduce attack surface
+      "--sysctl=net.ipv6.conf.all.disable_ipv6=1",    // Disable IPv6 globally
+      "--sysctl=net.ipv6.conf.default.disable_ipv6=1", // Disable IPv6 by default
+      
+      // Network capability restrictions
+      "--cap-drop=NET_RAW",                            // Disable raw packet access
+      "--network=bridge",                              // Use bridge networking
+      
+      // DNS configuration for security and reliability
+      "--dns=1.1.1.1",                                // Primary DNS (Cloudflare)
+      "--dns=1.0.0.1",                                // Secondary DNS (Cloudflare)
+  
+      // Resource limits for container performance and security
+      // Play a little bit with resources to prevent resource exhaustion
+      // "--memory=512m",                              // Memory limit (commented out)
+      // "--cpus=2"                                    // CPU limit (commented out)
+    ],
+  
+    // Writable mounts in case you want to set --read-only above.
+    // Currently no additional mounts are configured
+    "mounts": [
+      ]
 }
