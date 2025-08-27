@@ -1,13 +1,17 @@
-# The Red Guild's devcontainer exploration
+# The Red Guild's devcontainer explorations
 
-This container is always a work in progress. Feel free to suggest improvements or requirements as
+This repo is always a work in progress. Feel free to suggest improvements or requirements as
 well. Check out similar projects like **@Deivitto**'s auditor-docker and **@trailofbit's**
 eth-security-toolbox.
 
-The most important thing about this devcontainer, is that we always try to find the best way to
-install the most popular tools, so they can all work seamlessly, and at the same time add security
-by default. If you want to know more, and really want to take advante of this devcontainer read
+The most important thing about these devcontainers is that we always try to find the best way to
+install the most popular tools, so they can all work seamlessly, and at the same time, add security
+by default. If you want to know more and really want to take advantage of these devcontainers, read
 below.
+
+## Quickstart with Wizard
+// placeholder
+
 
 ## Available Devcontainer Variants
 
