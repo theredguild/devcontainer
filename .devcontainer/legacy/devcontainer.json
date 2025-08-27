@@ -1,13 +1,13 @@
 {
   // For format details, see https://aka.ms/devcontainer.json.
-  "name": "TRG's DevContainer",
+  "name": "Legacy TRG's DevContainer",
 
   // You can use image or directly use a Dockerfile or Docker Compose file.
   // More info: https://containers.dev/guide/dockerfile
   // https://github.com/devcontainers/images/tree/main/src/base-alpine
   // "image": "mcr.microsoft.com/devcontainers/base:debian",
   "build": {
-    "dockerfile": "../Dockerfile"
+    "dockerfile": "./Dockerfile"
   },
 
   // In this case this is redundant, because we are using the default user.

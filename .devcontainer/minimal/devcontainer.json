@@ -1,0 +1,121 @@
+{
+    // For format details, see https://aka.ms/devcontainer.json.
+    // This is the MINIMAL version of TRG's DevContainer - provides essential security isolation
+    // with a balanced approach between security and usability for Web3 development.
+    "name": "Minimal TRG's DevContainer",
+  
+    // You can use image or directly use a Dockerfile or Docker Compose file.
+    // More info: https://containers.dev/guide/dockerfile
+    // https://github.com/devcontainers/images/tree/main/src/base-alpine
+    // "image": "mcr.microsoft.com/devcontainers/base:debian",
+    "build": {
+      "dockerfile": "./Dockerfile"
+    },
+  
+    // In this case this is redundant, because we are using the default user.
+    // The vscode user is the default in VS Code DevContainers
+    //"remoteUser": "vscode",
+  
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    // Currently no additional features are enabled for minimal configuration
+    "features": {
+      // "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      //   "version": "latest",
+      //   "moby": true
+      // }
+    },
+  
+    // Mount isolation configuration for security and development workflow
+    // If you need to extract something from within the container, you can use docker cp, but use it at your own risk. 
+    // If you want to develop your devcontainer, you should comment this things, otherwise your changes inside the live container won't persist.
+    // Disables mounting the host workspace into the container for isolation.
+    "workspaceMount": "type=tmpfs,destination=/workspace",
+    // Sets a workspace path entirely isolated within the container
+    "workspaceFolder": "/workspace",
+    
+    // Docker run arguments for security hardening and resource management
+    "runArgs": [
+      // Read only filesystem except for explicitly writable volumes (check mounts)
+      // For a dev environment this is more a hussle than a feature.
+      // "--read-only",
+      
+      // Temporary filesystem mounts with security restrictions
+      // These provide isolated, size-limited temporary storage
+      "--tmpfs=/tmp:rw,noexec,nosuid,size=512m",      // Main temporary directory
+      "--tmpfs=/var/tmp:rw,noexec,nosuid,size=512m",  // System temporary directory
+      "--tmpfs=/dev/shm:rw,noexec,nosuid,size=64m",   // Shared memory directory
+      
+      // Security hardening - drop all Linux capabilities
+      // This reduces the attack surface by removing unnecessary privileges
+      "--cap-drop=ALL",
+  
+      // Security options for container isolation
+      // A few security additions (AppArmor & no new privileges)
+      "--security-opt", "no-new-privileges",           // Prevent privilege escalation
+      "--security-opt", "apparmor:docker-default",     // Use Docker's default AppArmor profile
+  
+      // Use seccomp's default security profile
+      // seccomp provides system call filtering for additional security
+      // "--security-opt", "seccomp=default",
+  
+      // Network security configuration
+      // If you really want to isolate it, just disconnect it from the internet. 
+      // You should COPY your working files inside before, otherwise you'll have to mount them manually.
+      // "--network=none",
+      
+      // IPv6 security - disable IPv6 to reduce attack surface
+      "--sysctl=net.ipv6.conf.all.disable_ipv6=1",    // Disable IPv6 globally
+      "--sysctl=net.ipv6.conf.default.disable_ipv6=1", // Disable IPv6 by default
+      
+      // Network capability restrictions
+      "--cap-drop=NET_RAW",                            // Disable raw packet access
+      "--network=bridge",                              // Use bridge networking
+      
+      // DNS configuration for security and reliability
+      "--dns=1.1.1.1",                                // Primary DNS (Cloudflare)
+      "--dns=1.0.0.1",                                // Secondary DNS (Cloudflare)
+  
+      // Resource limits for container performance and security
+      // Play a little bit with resources to prevent resource exhaustion
+      // "--memory=512m",                              // Memory limit (commented out)
+      // "--cpus=2"                                    // CPU limit (commented out)
+    ],
+  
+    // Writable mounts in case you want to set --read-only above.
+    // Currently no additional mounts are configured
+    "mounts": [
+      ],
+  
+  
+  // Configure tool-specific properties for VS Code
+    "customizations": {
+    // Configure properties specific to VS Code.
+      "vscode": {
+        "settings": {
+          // Security settings - killswitch for automated tasks
+          "task.autoDetect": "off",                    // Disable automatic task detection
+          "task.problemMatchers.autoDetect": "off",    // Disable automatic problem matchers
+          
+          // Trust and security configuration
+          "security.workspace.trust.enabled": false,   // Trust no one by default
+          
+          // Privacy settings - killswitch for telemetry
+          "telemetry.telemetryLevel": "off",           // Disable all telemetry collection
+          
+          // Terminal configuration
+          "terminal.integrated.defaultProfile.linux": "zsh",  // Use zsh by default
+          "terminal.integrated.profiles.linux": { "zsh": { "path": "/usr/bin/zsh" } }
+          // Using bash might be more safe and stable, but zsh provides better features
+        },
+        "extensions": [
+          // Minimal set of essential extensions for Web3 development
+          "NomicFoundation.hardhat-solidity",          // Hardhat Solidity support
+          "tintinweb.solidity-visual-auditor"          // Solidity visual auditor
+        ]
+      }
+    }
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": ""
+  // Use 'postAttachCommand' to attach a command after the container is opened.
+    // "postAttachCommand": "zsh"
+  }

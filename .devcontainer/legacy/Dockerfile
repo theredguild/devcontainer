@@ -6,20 +6,15 @@
 # TODO: "Ensure the base image uses a non latest version tag"
 FROM --platform=linux/amd64 ghcr.io/crytic/echidna/echidna:latest AS echidna
 
-# Grab at least python 3.12
-FROM python:3.12-slim as python-base
-
 # Base debian build (latest).
 FROM mcr.microsoft.com/vscode/devcontainers/base:debian
 
 # Switch to root (the default might be root anyway)
 USER root
 
-COPY --from=python-base /usr/local /usr/local
-
 # Super basic stuff to get everything started
 RUN apt-get update -y && apt-get install -y \
-    zsh python3-dev libpython3-dev build-essential vim curl git sudo pkg-config \
+    zsh python3-pip python3-venv python3-dev libpython3-dev build-essential vim curl git sudo pkg-config \
     --no-install-recommends
 
 # The base container usually has a “vscode” user. If not, create one here.
@@ -38,6 +33,9 @@ ENV USR_LOCAL_BIN=/usr/local/bin
 ENV LOCAL_BIN=${HOME}/.local/bin
 ENV PNPM_HOME=${HOME}/.local/share/pnpm
 ENV PATH=${PATH}:${USR_LOCAL_BIN}:${LOCAL_BIN}:${PNPM_HOME}
+
+# Configure pip to allow system packages in container environment
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Install uv
 RUN python3 -m pip install --no-cache-dir --upgrade uv

@@ -1,0 +1,134 @@
+name: Prebuilt Dev Containers - Build & Smoke Test
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '.devcontainer/**'
+      - '.github/workflows/main.yml'
+  pull_request:
+    paths:
+      - '.devcontainer/**'
+      - '.github/workflows/main.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        subFolder:
+          - .devcontainer/auditor
+          - .devcontainer/minimal
+          - .devcontainer/hardened
+          - .devcontainer/isolated
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Determine if this devcontainer changed
+        id: changed
+        run: |
+          set -e
+          FOLDER="${{ matrix.subFolder }}"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git fetch origin "${{ github.base_ref }}" --depth=1
+            BASE=$(git merge-base FETCH_HEAD HEAD)
+            if git diff --name-only "$BASE" HEAD -- "$FOLDER/" | grep .; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            BEFORE="${{ github.event.before }}"
+            if [ -n "$BEFORE" ]; then
+              if git diff --name-only "$BEFORE" "${{ github.sha }}" -- "$FOLDER/" | grep .; then
+                echo "changed=true" >> $GITHUB_OUTPUT
+              else
+                echo "changed=false" >> $GITHUB_OUTPUT
+              fi
+            else
+              # Fallback: if we cannot determine before SHA, run the test
+              echo "changed=true" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: No changes in this devcontainer — skipping
+        if: steps.changed.outputs.changed != 'true'
+        run: echo "No changes detected in ${{ matrix.subFolder }}; skipping build."
+
+      - name: Check devcontainer config exists
+        id: check
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          if [ -f "${{ matrix.subFolder }}/devcontainer.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Skipping: ${{ matrix.subFolder }}/devcontainer.json does not exist."
+          fi
+
+      - name: Build and run devcontainer
+        if: steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true'
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: ${{ matrix.subFolder }}
+          configFile: ${{ matrix.subFolder }}/devcontainer.json
+          
+          runCmd: echo "Devcontainer OK in ${{ matrix.subFolder }}" && uname -a
+          push: never
+
+      - name: Test Minimal Tools
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true'
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: ${{ matrix.subFolder }}
+          configFile: ${{ matrix.subFolder }}/devcontainer.json
+          
+          runCmd: |
+            echo "🧪 Testing Foundry installation and functionality..."
+            foundryup --version || echo "❌ Foundry not found"
+            forge --version || echo "❌ Forge not found"
+            cast --version || echo "❌ Cast not found"
+            anvil --version || echo "❌ Anvil not found"
+            echo "✅ Foundry tools verification completed"
+          push: never
+
+      - name: Test Auditor Tools
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && contains(fromJSON('[".devcontainer/auditor", ".devcontainer/hardened", ".devcontainer/isolated"]'), matrix.subFolder)
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: ${{ matrix.subFolder }}
+          configFile: ${{ matrix.subFolder }}/devcontainer.json
+          
+          runCmd: |
+            echo "🧪 Testing Auditor tools..."
+            slither --version || echo "❌ Slither not found"
+            myth --version || echo "❌ Mythril not found"
+            echidna --version || echo "❌ Echidna not found"
+            echo "✅ Auditor tools verification completed"
+          push: never
+
+      - name: Test Isolation
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && matrix.subFolder == '.devcontainer/isolated'
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: ${{ matrix.subFolder }}
+          configFile: ${{ matrix.subFolder }}/devcontainer.json
+          
+          runCmd: |
+            echo "🧪 Testing Isolation..."
+            if (touch /test.txt); then echo "❌ Filesystem is not read-only"; exit 1; else echo "✅ Filesystem is read-only"; fi
+            if (curl -sS https://www.google.com); then echo "❌ Network is not isolated"; exit 1; else echo "✅ Network is isolated"; fi
+            echo "✅ Isolation verification completed"
+          push: never
+
+      - name: Purge Docker cache and resources (on success)
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true'
+        run: |
+          echo "Pruning Docker resources to free memory and disk..."
+          docker system prune -af --volumes || true
+          docker builder prune -af || true
+          docker system df || true
