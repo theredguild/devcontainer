@@ -10,8 +10,16 @@ by default. If you want to know more and really want to take advantage of these 
 below.
 
 ## Quickstart with Wizard
-// placeholder
 
+You can use any prebuilt container using our [Devcontainer Wizard](https://github.com/theredguild/devcontainer-wizard):
+
+![Simple wizard Example](./assets/wizard.gif)
+
+## Quickstart with Github Codespaces
+
+You can also run prebuilt containers using GitHub Codespaces: 
+
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&template_repository=theredguild/devcontainer)
 
 ## Available Devcontainer Variants
 
