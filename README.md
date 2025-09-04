@@ -9,7 +9,7 @@ install the most popular tools, so they can all work seamlessly, and at the same
 by default. If you want to know more and really want to take advantage of these devcontainers, read
 below.
 
-## Quickstart with Wizard
+## Quickstart with Devcontainer Wizard
 
 You can use any prebuilt container using our [Devcontainer Wizard](https://github.com/theredguild/devcontainer-wizard):
 
@@ -25,26 +25,20 @@ You can also run prebuilt containers using GitHub Codespaces:
 
 We now offer multiple devcontainer configurations to suit different security and development needs:
 
-### **Isolated** (`.devcontainer/isolated/`)
-**Best for**: Maximum security isolation, air-gapped environments
-- **Focus**: Complete isolation with read-only filesystem and network isolation
-- **Includes**: All security tools, fuzzing tools (Echidna, Medusa), static analysis
-- **Security**: Read-only filesystem, network isolation, capability dropping, tmpfs mounts
-- **Extensions**: Comprehensive Ethereum security bundle, audit tools, decompilers
-- **Use case**: High-security research and isolated analysis
-
-### **Hardened** (`.devcontainer/hardened/`)
-**Best for**: Enhanced security with development flexibility
-- **Focus**: Security hardening with maintained network connectivity
-- **Includes**: Core security tools, Foundry, Hardhat, reduced tool set for security focus
-- **Security**: Capability dropping, security options, resource limits, DNS hardening
-- **Extensions**: Essential security extensions, development tools
-- **Use case**: Secure development, security-focused research, balanced security/functionality
+### **Air-gapped** (`.devcontainer/airgapped/`)
+**Best for**: Workspace isolation with tighter security defaults
+- **Focus**: Isolated workspace using tmpfs; secure defaults while keeping connectivity
+- **Includes**: Slither, Mythril, Crytic-compile, Foundry, Hardhat, Echidna
+- **Security**: Capability dropping, AppArmor, no-new-privileges, multiple tmpfs mounts; not read-only
+- **Network**: Uses bridge networking (no network isolation by default)
+- **Extensions**: None configured by default (because it fails with `network-none`)
+- **Use case**: Experiments requiring workspace isolation without cutting off the network
 
 ### **Auditor** (`.devcontainer/auditor/`)
 **Best for**: Smart contract auditors and security researchers
-- **Focus**: Specialized audit tooling and Docker-in-Docker support
+- **Focus**: Specialized audit tooling with Docker-in-Docker support
 - **Includes**: Slither, Mythril, Crytic-compile, Foundry, Hardhat, Echidna
+- **Workspace**: Host workspace bind-mounted into `/workspace` (no isolation)
 - **Features**: Docker-in-Docker, specialized audit extensions, focused toolchain
 - **Extensions**: Solidity visual auditor, metrics, audit tools, GitLens
 - **Use case**: Comprehensive smart contract audits, security analysis, research workflows
@@ -54,6 +48,7 @@ We now offer multiple devcontainer configurations to suit different security and
 - **Focus**: Core tools only, streamlined development environment
 - **Includes**: Foundry, Hardhat, basic Solidity support, essential Python tools
 - **Security**: Basic hardening, capability dropping, IPv6 disabled
+- **Workspace**: Host workspace bind-mounted into `/workspace` (no isolation)
 - **Extensions**: Core development extensions only
 - **Use case**: Quick prototyping, learning, basic development, resource-constrained environments
 
@@ -61,9 +56,19 @@ We now offer multiple devcontainer configurations to suit different security and
 **Best for**: Complete toolchain with all features (original experience)
 - **Focus**: Full-featured development environment with comprehensive security tools
 - **Includes**: Complete tool suite, all security tools, fuzzing tools, analysis tools
-- **Security**: Comprehensive hardening, isolation features, security options
+- **Security**: Comprehensive hardening; workspace isolated via tmpfs
+- **Workspace**: Isolated workspace (tmpfs mount, not host-bound)
 - **Extensions**: Full extension suite, all security and development tools
 - **Use case**: Comprehensive development, learning, full-stack projects, research
+
+### **(EXPERIMENTAL) Paranoid** (`.devcontainer/paranoid/`)
+**Best for**: Maximum security isolation with read-only OS.
+- **Focus**: Strong isolation with read-only filesystem and ephemeral workspace
+- **Includes**: Git, GitHub CLI; minimal by default
+- **Security**: Read-only filesystem, capability dropping, extensive tmpfs mounts for VS Code and caches
+- **Network**: No explicit network isolation by default (can be enabled via `--network=none`)
+- **Extensions**: None configured by default
+- **Use case**: High-security tests where persistence should be avoided
 
 ## Project Structure
 
