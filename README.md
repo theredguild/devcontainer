@@ -26,13 +26,22 @@ You can also run prebuilt containers using GitHub Codespaces:
 We now offer multiple devcontainer configurations to suit different security and development needs:
 
 ### **Air-gapped** (`.devcontainer/airgapped/`)
-**Best for**: Workspace isolation with tighter security defaults
+**Best for**: Workspace isolation with enhanced security
 - **Focus**: Isolated workspace using tmpfs; secure defaults while keeping connectivity
-- **Includes**: Slither, Mythril, Crytic-compile, Foundry, Hardhat, Echidna
+- **Includes**: Git, GitHub CLI; security tools available via Dockerfile
 - **Security**: Capability dropping, AppArmor, no-new-privileges, multiple tmpfs mounts; not read-only
 - **Network**: Uses bridge networking (no network isolation by default)
 - **Extensions**: None configured by default (because it fails with `network-none`)
 - **Use case**: Experiments requiring workspace isolation without cutting off the network
+
+### **Isolated** (`.devcontainer/isolated/`)
+**Best for**: Enhanced security with development flexibility
+- **Focus**: Security hardening with maintained network connectivity and security extensions
+- **Includes**: Security tools, Foundry, Hardhat, audit tools via Dockerfile
+- **Security**: Capability dropping, AppArmor, no-new-privileges, tmpfs workspace isolation
+- **Network**: Uses bridge networking (no network isolation by default)
+- **Extensions**: Comprehensive security extensions (Ethereum Security Bundle, Trail of Bits tools)
+- **Use case**: Secure development, security-focused research, balanced security/functionality
 
 ### **Auditor** (`.devcontainer/auditor/`)
 **Best for**: Smart contract auditors and security researchers
@@ -77,7 +86,7 @@ The project supports multiple devcontainer configurations for different use case
 ```
 .devcontainer/
 ├── isolated/          # Maximum security isolation
-├── hardened/          # Enhanced security with flexibility
+├── airgapped/         # Enhanced security with flexibility
 ├── auditor/           # Specialized audit environment
 ├── minimal/           # Essential tools only
 └── legacy/            # Complete toolchain (original)

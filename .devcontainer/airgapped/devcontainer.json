@@ -88,15 +88,7 @@
       // Network security configuration
       // If you really want to isolate it, just disconnect it from the internet. 
       // You should COPY your working files inside before, otherwise you'll have to mount them manually.
-      // "--network=none",
-      
-      // IPv6 security - disable IPv6 to reduce attack surface
-      "--sysctl=net.ipv6.conf.all.disable_ipv6=1",    // Disable IPv6 globally
-      "--sysctl=net.ipv6.conf.default.disable_ipv6=1", // Disable IPv6 by default
-      
-      // Network capability restrictions
-      "--cap-drop=NET_RAW",                            // Disable raw packet access
-      "--network=bridge",                              // Use bridge networking
+      "--network=none",
       
       // DNS configuration for security and reliability
       "--dns=1.1.1.1",                                // Primary DNS (Cloudflare)
