@@ -23,6 +23,7 @@ jobs:
           - .devcontainer/minimal
           - .devcontainer/isolated
           - .devcontainer/airgapped
+          - .devcontainer/eth-security-toolbox
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
