@@ -11,19 +11,15 @@ below.
 
 > [!IMPORTANT]
 > Dev Containers can improve your workflow, but they are **not a fully secure environment**.  
-> If you need to run untrusted or suspicious code, use [GitHub Codespaces](https://github.com/codespaces/new?hide_repo_select=true&ref=main&template_repository=theredguild/devcontainer), GitPod, or a similar remote setup — **never run it directly on your machine**.
+> If you need to run untrusted or suspicious code, use GitHub Codespaces, GitPod, or a similar remote setup — **never run it directly on your machine**.
 
 
 > [!CAUTION]
 > **VS Code considerations:**
 >
-> VS Code does a lot to improve user experience, but that comes with security tradeoffs. For example, by default, VS Code allows API calls to open new terminals, even bypassing the host machine:
-> ```bash
-> code --command workbench.action.terminal.newLocal
-> ```
-> We're working on an article covering all the tricks VS Code uses — stay tuned.
+> VS Code does a lot to improve user experience, but that doesn't come without security tradeoffs. VS Code might allow API calls that can lead to running arbitrary commands on the host machine, and by default, it shares sockets such as the gpg-agent’s, which means keys stored outside the container can be used for signing. This opens the door to blind-signing commits scenarios, where a process inside the container may trigger signatures without the user’s full awareness. If you want to deep dive into these "tricks", we're working on an article covering the most relevant of them — stay tuned.
 
-## Quickstart with Github Codespaces
+## Quickstart with GitHub Codespaces
 
 You can also run our prebuilt container intended for GitHub Codespaces: 
 
