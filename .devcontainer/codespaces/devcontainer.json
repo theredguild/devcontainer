@@ -35,7 +35,4 @@
             }
         }
     },
-    
-    // Sets a workspace path entirely hardened within the container
-    "workspaceFolder": "/workspace"
 }
