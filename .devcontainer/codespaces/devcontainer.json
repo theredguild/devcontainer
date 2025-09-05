@@ -2,7 +2,7 @@
     // For format details, see https://aka.ms/devcontainer.json.
     // This is a Dev Container for Github Codespaces based on eth-security-toolbox image created by Trail of Bits
     // check https://github.com/trailofbits/eth-security-toolbox for more information.
-    "name": "codespaces",
+    "name": "Codespaces TRG's DevContainer",
     
     // Build configuration - uses the eth-security-toolbox image
     "image": "ghcr.io/trailofbits/eth-security-toolbox:nightly",
