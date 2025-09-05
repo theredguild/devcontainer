@@ -1,0 +1,91 @@
+{
+    // For format details, see https://aka.ms/devcontainer.json.
+    // This is a Dev Container based on eth-security-toolbox image created by Trail of Bits
+    // check https://github.com/trailofbits/eth-security-toolbox for more information.
+    "name": "eth-security-toolbox",
+    
+    // Build configuration - uses the eth-security-toolbox image
+    "image": "ghcr.io/trailofbits/eth-security-toolbox:nightly",
+    // Configure tool-specific properties for VS Code
+    "customizations": {
+        "vscode": {
+            // Specialized extensions for smart contract auditing and development
+            "extensions": [ 
+                // check out https://marketplace.visualstudio.com/items?itemName=tintinweb.ethereum-security-bundle for more information
+                "tintinweb.ethereum-security-bundle", // includes what is listed above ^
+                "tintinweb.vscode-ethover",
+                "trailofbits.weaudit",
+                "trailofbits.contract-explorer",
+                "trailofbits.sarif-explorer"
+            ],
+            // VS Code settings optimized for auditing workflows
+            "settings": {
+                    // Security settings - killswitch for automated tasks
+                    "task.autoDetect": "off",                    // Disable automatic task detection
+                    "task.problemMatchers.autoDetect": "off",    // Disable automatic problem matchers
+                    
+                    // Trust and security configuration
+                    "security.workspace.trust.enabled": false,   // Trust no one by default
+                    
+                    // Privacy settings - killswitch for telemetry
+                    "telemetry.telemetryLevel": "off",           // Disable all telemetry collection
+                    
+                    // Terminal configuration
+                    "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    },
+    
+    // Mount copying host folder into container, no isolation.
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    // Sets a workspace path entirely isolated within the container
+    "workspaceFolder": "/workspace",
+    
+    // Docker run arguments for security hardening and resource management
+    "runArgs": [
+      // Read only filesystem except for explicitly writable volumes (check mounts)
+      // For a dev environment this is more a hussle than a feature.
+      // "--read-only",
+      
+      // Temporary filesystem mounts with security restrictions
+      // These provide isolated, size-limited temporary storage
+      "--tmpfs=/tmp:rw,noexec,nosuid,size=512m",      // Main temporary directory
+      "--tmpfs=/var/tmp:rw,noexec,nosuid,size=512m",  // System temporary directory
+      "--tmpfs=/dev/shm:rw,noexec,nosuid,size=64m",   // Shared memory directory
+      
+      // Security hardening - drop all Linux capabilities
+      // This reduces the attack surface by removing unnecessary privileges
+      "--cap-drop=ALL",
+  
+      // Security options for container isolation
+      // A few security additions (AppArmor & no new privileges)
+      "--security-opt", "no-new-privileges",           // Prevent privilege escalation
+      "--security-opt", "apparmor:docker-default",     // Use Docker's default AppArmor profile
+  
+      // Use seccomp's default security profile
+      // seccomp provides system call filtering for additional security
+      // "--security-opt", "seccomp=default",
+  
+      // Network security configuration
+      // If you really want to isolate it, just disconnect it from the internet. 
+      // You should COPY your working files inside before, otherwise you'll have to mount them manually.
+      // "--network=none",
+      
+      // IPv6 security - disable IPv6 to reduce attack surface
+      "--sysctl=net.ipv6.conf.all.disable_ipv6=1",    // Disable IPv6 globally
+      "--sysctl=net.ipv6.conf.default.disable_ipv6=1", // Disable IPv6 by default
+      
+      // Network capability restrictions
+      "--cap-drop=NET_RAW",                            // Disable raw packet access
+      "--network=bridge",                              // Use bridge networking
+      
+      // DNS configuration for security and reliability
+      "--dns=1.1.1.1",                                // Primary DNS (Cloudflare)
+      "--dns=1.0.0.1",                                // Secondary DNS (Cloudflare)
+  
+      // Resource limits for container performance and security
+      // Play a little bit with resources to prevent resource exhaustion
+      // "--memory=512m",                              // Memory limit (commented out)
+      // "--cpus=2"                                    // CPU limit (commented out)
+    ]
+}
