@@ -58,9 +58,9 @@
         }
     },
     
-    // Mount copying host folder into container, no isolation.
+    // Mount copying host folder into container, no hardening.
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-    // Sets a workspace path entirely isolated within the container
+    // Sets a hardened workspace path 
     "workspaceFolder": "/workspace",
     
     // Docker run arguments for security hardening and resource management

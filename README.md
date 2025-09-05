@@ -9,6 +9,20 @@ install the most popular tools, so they can all work seamlessly, and at the same
 by default. If you want to know more and really want to take advantage of these devcontainers, read
 below.
 
+> [!IMPORTANT]
+> Dev Containers can improve your workflow, but they are **not a fully secure environment**.  
+> If you need to run untrusted or suspicious code, use [GitHub Codespaces](https://github.com/codespaces/new?hide_repo_select=true&ref=main&template_repository=theredguild/devcontainer), GitPod, or a similar remote setup — **never run it directly on your machine**.
+
+
+> [!CAUTION]
+> **VS Code considerations:**
+>
+> VS Code does a lot to improve user experience, but that comes with security tradeoffs. For example, by default, VS Code allows API calls to open new terminals, even bypassing the host machine:
+> ```bash
+> code --command workbench.action.terminal.newLocal
+> ```
+> We're working on an article covering all the tricks VS Code uses — stay tuned.
+
 ## Quickstart with Devcontainer Wizard
 
 You can use any prebuilt container using our [Devcontainer Wizard](https://github.com/theredguild/devcontainer-wizard):
@@ -26,20 +40,20 @@ You can also run prebuilt containers using GitHub Codespaces:
 We now offer multiple devcontainer configurations to suit different security and development needs:
 
 ### **Air-gapped** (`.devcontainer/airgapped/`)
- Complete network isolation.
+ Complete network hardening.
 
-- **Focus**: Isolated workspace using tmpfs without network.
+- **Focus**: Hardened workspace using tmpfs without network.
 - **Includes**: Git, GitHub CLI; security tools available via Dockerfile
 - **Security**: Capability dropping, AppArmor, no-new-privileges, multiple tmpfs mounts; not read-only
 - **Network**: Uses bridge networking (no network isolation by default)
 - **Extensions**: None configured by default (because it fails with `network-none`)
 
-### **Isolated** (`.devcontainer/isolated/`)
-**Use case**: Use an isolated workspace without copying your environment.
+### **Hardened** (`.devcontainer/hardened/`)
+**Use case**: Use an hardened workspace without copying your environment.
 
 - **Focus**: Security hardening with maintained network connectivity and security extensions
 - **Includes**: Security tools, Foundry, Hardhat, audit tools via Dockerfile
-- **Security**: Capability dropping, AppArmor, no-new-privileges, tmpfs workspace isolation
+- **Security**: Capability dropping, AppArmor, no-new-privileges, tmpfs workspace hardening
 - **Network**: Uses bridge networking (no network isolation by default)
 - **Extensions**: Comprehensive security extensions (Ethereum Security Bundle, Trail of Bits tools)
 
@@ -48,7 +62,7 @@ We now offer multiple devcontainer configurations to suit different security and
 
 - **Focus**: Specialized audit tooling with Docker-in-Docker support
 - **Includes**: Slither, Mythril, Crytic-compile, Foundry, Hardhat, Echidna
-- **Workspace**: Host workspace bind-mounted into `/workspace` (no isolation)
+- **Workspace**: Host workspace bind-mounted into `/workspace`
 - **Features**: Docker-in-Docker, specialized audit extensions, focused toolchain
 - **Extensions**: Solidity visual auditor, metrics, audit tools, GitLens
 
@@ -58,7 +72,7 @@ We now offer multiple devcontainer configurations to suit different security and
 - **Focus**: Core tools only, streamlined development environment
 - **Includes**: Foundry, Hardhat, basic Solidity support, essential Python tools
 - **Security**: Basic hardening, capability dropping, IPv6 disabled
-- **Workspace**: Host workspace bind-mounted into `/workspace` (no isolation)
+- **Workspace**: Host workspace bind-mounted into `/workspace`
 - **Extensions**: Core development extensions only
 
 ### **ETH Security Toolbox** (`.devcontainer/eth-security-toolbox/`)
@@ -66,16 +80,16 @@ We now offer multiple devcontainer configurations to suit different security and
 
 - **Focus**: All the tools in the ETH Security Toolbox.
 - **Includes**: All the tools in the ETH Security Toolbox.
-- **Workspace**: Host workspace bind-mounted into `/workspace` (no isolation)
+- **Workspace**: Host workspace bind-mounted into `/workspace` (no hardening)
 - **Extensions**: All the tools in the ETH Security Toolbox.
 
 ### **(EXPERIMENTAL) Paranoid** (`.devcontainer/paranoid/`)
-**Use case**: Maximum security isolation with read-only filesystem and ephemeral workspace.
+**Use case**: Maximum security hardening with read-only filesystem and ephemeral workspace.
 
-- **Focus**: Strong isolation with read-only filesystem and ephemeral workspace
+- **Focus**: Strong hardening with read-only filesystem and ephemeral workspace
 - **Includes**: Git, GitHub CLI; minimal by default
 - **Security**: Read-only filesystem, capability dropping, extensive tmpfs mounts for VS Code and caches
-- **Network**: No explicit network isolation by default (can be enabled via `--network=none`)
+- **Network**: No explicit network hardening by default (can be enabled via `--network=none`)
 - **Extensions**: None configured by default
 
 ### **Legacy** (`.devcontainer/legacy/`)
@@ -83,8 +97,8 @@ We now offer multiple devcontainer configurations to suit different security and
 
 - **Focus**: Full-featured development environment with comprehensive security tools
 - **Includes**: Complete tool suite, all security tools, fuzzing tools, analysis tools
-- **Security**: Comprehensive hardening; workspace isolated via tmpfs
-- **Workspace**: Isolated workspace (tmpfs mount, not host-bound)
+- **Security**: Comprehensive hardening; workspace hardened via tmpfs
+- **Workspace**: Hardened workspace (tmpfs mount, not host-bound)
 - **Extensions**: Full extension suite, all security and development tools
 
 ## Project Structure
@@ -93,7 +107,7 @@ The project supports multiple devcontainer configurations for different use case
 
 ```
 .devcontainer/
-├── isolated/          # Maximum security isolation
+├── hardened/          # Hardened
 ├── airgapped/         # Enhanced security with flexibility
 ├── auditor/           # Specialized audit environment
 ├── minimal/           # Essential tools only

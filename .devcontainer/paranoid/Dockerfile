@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1.8
 # check=error=true
 # 
-# ISOLATED TRG DevContainer Dockerfile
-# This Dockerfile creates a highly isolated development environment for Web3 security research
-# with maximum security isolation, read-only filesystem, and network isolation.
+# PARANOID TRG DevContainer Dockerfile
+# This Dockerfile creates a highly paranoid development environment for Web3 security research
+# with maximum security hardening, read-only filesystem, and network hardening.
 # 
 # Key security features:
 # - Non-root user execution

@@ -21,7 +21,7 @@ jobs:
         subFolder:
           - .devcontainer/auditor
           - .devcontainer/minimal
-          - .devcontainer/isolated
+          - .devcontainer/hardened
           - .devcontainer/airgapped
           - .devcontainer/eth-security-toolbox
     steps:
@@ -100,7 +100,7 @@ jobs:
           push: never
 
       - name: Test Auditor Tools
-        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && contains(fromJSON('[".devcontainer/auditor", ".devcontainer/isolated", ".devcontainer/airgapped"]'), matrix.subFolder)
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && contains(fromJSON('[".devcontainer/auditor", ".devcontainer/hardened", ".devcontainer/airgapped"]'), matrix.subFolder)
         uses: devcontainers/ci@v0.3
         with:
           subFolder: ${{ matrix.subFolder }}
@@ -114,8 +114,8 @@ jobs:
             echo "✅ Auditor tools verification completed"
           push: never
 
-      - name: Test Filesystem Isolation
-        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && matrix.subFolder == '.devcontainer/isolated'
+      - name: Test Filesystem Hardening
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && matrix.subFolder == '.devcontainer/hardened'
         uses: devcontainers/ci@v0.3
         with:
           subFolder: ${{ matrix.subFolder }}
@@ -134,10 +134,10 @@ jobs:
             else
               echo "✅ /workspace does not exist inside the container (no host mount)"
             fi
-            echo "✅ /workspace isolation verification completed"
+            echo "✅ /workspace Hardening verification completed"
           push: never
 
-      - name: Test Network Isolation
+      - name: Test Network Hardening
         if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && matrix.subFolder == '.devcontainer/airgapped'
         uses: devcontainers/ci@v0.3
         with:
@@ -145,9 +145,9 @@ jobs:
           configFile: ${{ matrix.subFolder }}/devcontainer.json
           
           runCmd: |
-            echo "🧪 Testing Network Isolation..."
-            if (curl -sS https://www.google.com); then echo "❌ Network is not isolated"; exit 1; else echo "✅ Network is isolated"; fi
-            echo "✅ Network isolation verification completed"
+            echo "🧪 Testing Network Hardening..."
+            if (curl -sS https://www.google.com); then echo "❌ Network is not hardened"; exit 1; else echo "✅ Network is hardened"; fi
+            echo "✅ Network Hardening verification completed"
           push: never
 
 

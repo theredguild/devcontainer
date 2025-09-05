@@ -1,7 +1,7 @@
 {
   // For format details, see https://aka.ms/devcontainer.json.
-  // This is the ISOLATED version of TRG's DevContainer - provides maximum security isolation
-  // with a read-only filesystem and network isolation for high-security Web3 development.
+  // This is the hardened version of TRG's DevContainer - provides maximum security hardening
+  // with a read-only filesystem and network hardening for high-security Web3 development.
   "name": "(EXPERIMENTAL) Paranoid TRG's DevContainer",
   
   // Build configuration - uses the local Dockerfile in this directory
@@ -52,16 +52,16 @@
   },
   
   // Commands to run during container lifecycle
-  "initializeCommand": "echo 'Initializing isolated dev container...'",
+  "initializeCommand": "echo 'Initializing hardened dev container...'",
   "postStartCommand": "echo '🚀 Dev container is ready for Web3 development!'",
   
-  // Workspace configuration - isolated within container
+  // Workspace configuration - hardened within container
   "workspaceFolder": "/workspace",
-  // Mount workspace as tmpfs for complete isolation - no host file access.
+  // Mount workspace as tmpfs for complete hardening - no host file access.
   // This ensures that the workspace is ephemeral and does not persist data.
   "workspaceMount": "type=tmpfs,destination=/workspace,tmpfs-mode=1777",
   
-  // Docker run arguments for security and isolation
+  // Docker run arguments for security and hardening
   "runArgs": [
       // Security hardening - drop all Linux capabilities to reduce attack surface
       "--cap-drop=ALL",
@@ -69,7 +69,7 @@
       // Read-only filesystem for maximum security, preventing any persistent changes
       "--read-only",
       
-      // Security options for container isolation
+      // Security options for container hardening
       "--security-opt",
       "no-new-privileges:true",      // Prevent privilege escalation from within the container
       "--security-opt",
