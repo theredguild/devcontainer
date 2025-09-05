@@ -23,17 +23,18 @@ below.
 > ```
 > We're working on an article covering all the tricks VS Code uses — stay tuned.
 
+## Quickstart with Github Codespaces
+
+You can also run our prebuilt container intended for GitHub Codespaces: 
+
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&template_repository=theredguild%2Fdevcontainer&skip_quickstart=true&repo=772110522&machine=basicLinux32gb&geo=UsEast&devcontainer_path=.devcontainer%2Fcodespaces%2Fdevcontainer.json)
+
 ## Quickstart with Devcontainer Wizard
 
 You can use any prebuilt container using our [Devcontainer Wizard](https://github.com/theredguild/devcontainer-wizard):
 
 ![Simple wizard Example](./assets/wizard.gif)
 
-## Quickstart with Github Codespaces
-
-You can also run prebuilt containers using GitHub Codespaces: 
-
-[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&template_repository=theredguild/devcontainer)
 
 ## Available Devcontainer Variants
 
@@ -82,6 +83,10 @@ We now offer multiple devcontainer configurations to suit different security and
 - **Includes**: All the tools in the ETH Security Toolbox.
 - **Workspace**: Host workspace bind-mounted into `/workspace` (no hardening)
 - **Extensions**: All the tools in the ETH Security Toolbox.
+
+### **Codespaces** (`.devcontainer/codespaces/`)
+
+Intended for use with GitHub Codespaces, is like `eth-security-toolbox` variant without `runArgs`.
 
 ### **(EXPERIMENTAL) Paranoid** (`.devcontainer/paranoid/`)
 **Use case**: Maximum security hardening with read-only filesystem and ephemeral workspace.
