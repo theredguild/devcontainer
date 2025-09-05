@@ -21,8 +21,9 @@ jobs:
         subFolder:
           - .devcontainer/auditor
           - .devcontainer/minimal
-          - .devcontainer/hardened
           - .devcontainer/isolated
+          - .devcontainer/airgapped
+          - .devcontainer/eth-security-toolbox
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -94,10 +95,12 @@ jobs:
             cast --version || echo "❌ Cast not found"
             anvil --version || echo "❌ Anvil not found"
             echo "✅ Foundry tools verification completed"
+            echo "🧪 Testing Hardhat installation and functionality..."
+            hardhat --version || echo "❌ Hardhat not found"
           push: never
 
       - name: Test Auditor Tools
-        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && contains(fromJSON('[".devcontainer/auditor", ".devcontainer/hardened", ".devcontainer/isolated"]'), matrix.subFolder)
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && contains(fromJSON('[".devcontainer/auditor", ".devcontainer/isolated", ".devcontainer/airgapped"]'), matrix.subFolder)
         uses: devcontainers/ci@v0.3
         with:
           subFolder: ${{ matrix.subFolder }}
@@ -111,7 +114,7 @@ jobs:
             echo "✅ Auditor tools verification completed"
           push: never
 
-      - name: Test Isolation
+      - name: Test Filesystem Isolation
         if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && matrix.subFolder == '.devcontainer/isolated'
         uses: devcontainers/ci@v0.3
         with:
@@ -119,11 +122,34 @@ jobs:
           configFile: ${{ matrix.subFolder }}/devcontainer.json
           
           runCmd: |
-            echo "🧪 Testing Isolation..."
-            if (touch /test.txt); then echo "❌ Filesystem is not read-only"; exit 1; else echo "✅ Filesystem is read-only"; fi
-            if (curl -sS https://www.google.com); then echo "❌ Network is not isolated"; exit 1; else echo "✅ Network is isolated"; fi
-            echo "✅ Isolation verification completed"
+            echo "🧪 Verifying that no host content is present in /workspace..."
+            if [ -d "/workspace" ]; then
+              if [ -n "$(ls -A /workspace 2>/dev/null || true)" ]; then
+                echo "❌ Found content in /workspace (possible host mount)"
+                ls -la /workspace || true
+                exit 1
+              else
+                echo "✅ /workspace exists but is empty (no host content)"
+              fi
+            else
+              echo "✅ /workspace does not exist inside the container (no host mount)"
+            fi
+            echo "✅ /workspace isolation verification completed"
           push: never
+
+      - name: Test Network Isolation
+        if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true' && matrix.subFolder == '.devcontainer/airgapped'
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: ${{ matrix.subFolder }}
+          configFile: ${{ matrix.subFolder }}/devcontainer.json
+          
+          runCmd: |
+            echo "🧪 Testing Network Isolation..."
+            if (curl -sS https://www.google.com); then echo "❌ Network is not isolated"; exit 1; else echo "✅ Network is isolated"; fi
+            echo "✅ Network isolation verification completed"
+          push: never
+
 
       - name: Purge Docker cache and resources (on success)
         if: success() && steps.check.outputs.exists == 'true' && steps.changed.outputs.changed == 'true'

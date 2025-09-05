@@ -1,7 +1,8 @@
 {
   // For format details, see https://aka.ms/devcontainer.json.
-  // This is the ISOLATED version of TRG's DevContainer - provides maximum security isolation
-  // with a read-only filesystem and network isolation for high-security Web3 development.
+  // This is the HARDENED version of TRG's DevContainer - provides enhanced security
+  // with capability dropping, security options, and resource limits while maintaining
+  // network connectivity for development.
   "name": "Isolated TRG's DevContainer",
   
   // Build configuration - uses the local Dockerfile in this directory
@@ -29,7 +30,6 @@
   "customizations": {
     "vscode": {
       // Web3 security and development extensions
-      // check out https://marketplace.visualstudio.com/items?itemName=tintinweb.ethereum-security-bundle for more information
       "extensions": [
         "tintinweb.ethereum-security-bundle",  // Comprehensive Ethereum security tools
         "tintinweb.vscode-ethover",           // Ethereum hover information
@@ -56,54 +56,70 @@
           "terminal.integrated.defaultProfile.linux": "zsh",  // Use zsh by default
           "terminal.integrated.profiles.linux": { "zsh": { "path": "/usr/bin/zsh" } }
           // Using bash might be more safe and stable, but zsh provides better features
-        }
+        },
     }
   },
   
   // Commands to run during container lifecycle
-  "initializeCommand": "echo 'Initializing isolated dev container...'",
+  "initializeCommand": "echo 'Initializing hardened dev container...'",
   "postStartCommand": "echo '🚀 Dev container is ready for Web3 development!'",
   
-  // Workspace configuration - isolated within container
-  "workspaceFolder": "/workspace",
-  // Mount workspace as tmpfs for complete isolation - no host file access.
-  // This ensures that the workspace is ephemeral and does not persist data.
-  "workspaceMount": "type=tmpfs,destination=/workspace,tmpfs-mode=1777",
-  
-  // Docker run arguments for security and isolation
-  "runArgs": [
-    // Security hardening - drop all Linux capabilities to reduce attack surface
-    "--cap-drop=ALL",
-    
-    // Read-only filesystem for maximum security, preventing any persistent changes
-    "--read-only",
-    
-    // Security options for container isolation
-    "--security-opt",
-    "no-new-privileges:true",      // Prevent privilege escalation from within the container
-    "--security-opt",
-    "apparmor=docker-default",     // Apply Docker's default AppArmor profile for enhanced security
-    
-    // Network isolation - completely disconnect from the internet for a secure environment
-    "--network=none",
-    
-      // --- Writable, EXECUTABLE Mounts for VS Code Server ---
-      "--tmpfs", "/home/vscode/.vscode-server:rw,exec,nosuid,size=512m,uid=1000,gid=1000",
-      "--tmpfs", "/home/vscode/.vscode-server-insiders:rw,exec,nosuid,size=256m,uid=1000,gid=1000",
 
-      // --- Writable, NON-EXECUTABLE Mounts for Caches, Configs, and Logs ---
-      "--tmpfs", "/home/vscode/.cache:rw,noexec,nosuid,size=256m,uid=1000,gid=1000",
-      "--tmpfs", "/home/vscode/.config:rw,noexec,nosuid,size=128m,uid=1000,gid=1000",
-      "--tmpfs", "/home/vscode/.local:rw,noexec,nosuid,size=256m,uid=1000,gid=1000",
-      "--tmpfs", "/home/vscode/.gnupg:rw,noexec,nosuid,size=32m,uid=1000,gid=1000",
-      "--tmpfs", "/tmp:rw,noexec,nosuid,size=512m",
-      "--tmpfs", "/var/tmp:rw,noexec,nosuid,size=512m",
-      "--tmpfs", "/var/log:rw,noexec,nosuid,size=128m",
-      "--tmpfs", "/run:rw,noexec,nosuid,size=128m",
-      "--tmpfs", "/home/vscode/.devcontainer:rw,noexec,nosuid,size=32m,uid=1000,gid=1000"
+    // Mount isolation configuration for security and development workflow
+    // If you need to extract something from within the container, you can use docker cp, but use it at your own risk. 
+    // If you want to develop your devcontainer, you should comment this things, otherwise your changes inside the live container won't persist.
+    // Disables mounting the host workspace into the container for isolation.
+    "workspaceMount": "type=tmpfs,destination=/workspace,tmpfs-mode=1777",
+    // Sets a workspace path entirely isolated within the container
+    "workspaceFolder": "/workspace",
     
-    // Resource limits for container performance and stability
-    // "--memory=1g",    // Limit container memory to 1GB to prevent resource exhaustion
-    // "--cpus=2"        // Limit container to 2 CPU cores for predictable performance
-  ]
+    // Docker run arguments for security hardening and resource management
+    "runArgs": [
+
+      // Temporary filesystem mounts with security restrictions
+      // These provide isolated, size-limited temporary storage
+      "--tmpfs=/tmp:rw,noexec,nosuid,size=512m",      // Main temporary directory
+      "--tmpfs=/var/tmp:rw,noexec,nosuid,size=512m",  // System temporary directory
+      "--tmpfs=/dev/shm:rw,noexec,nosuid,size=64m",   // Shared memory directory
+      
+      // Security hardening - drop all Linux capabilities
+      // This reduces the attack surface by removing unnecessary privileges
+      "--cap-drop=ALL",
+  
+      // Security options for container isolation
+      // A few security additions (AppArmor & no new privileges)
+      "--security-opt", "no-new-privileges",           // Prevent privilege escalation
+      "--security-opt", "apparmor:docker-default",     // Use Docker's default AppArmor profile
+  
+      // Use seccomp's default security profile
+      // seccomp provides system call filtering for additional security
+      // "--security-opt", "seccomp=default",
+  
+      // Network security configuration
+      // If you really want to isolate it, just disconnect it from the internet. 
+      // You should COPY your working files inside before, otherwise you'll have to mount them manually.
+      // "--network=none",
+      
+      // IPv6 security - disable IPv6 to reduce attack surface
+      "--sysctl=net.ipv6.conf.all.disable_ipv6=1",    // Disable IPv6 globally
+      "--sysctl=net.ipv6.conf.default.disable_ipv6=1", // Disable IPv6 by default
+      
+      // Network capability restrictions
+      "--cap-drop=NET_RAW",                            // Disable raw packet access
+      "--network=bridge",                              // Use bridge networking
+      
+      // DNS configuration for security and reliability
+      "--dns=1.1.1.1",                                // Primary DNS (Cloudflare)
+      "--dns=1.0.0.1",                                // Secondary DNS (Cloudflare)
+  
+      // Resource limits for container performance and security
+      // Play a little bit with resources to prevent resource exhaustion
+      // "--memory=512m",                              // Memory limit (commented out)
+      // "--cpus=2"                                    // CPU limit (commented out)
+    ],
+  
+    // Writable mounts in case you want to set --read-only above.
+    // Currently no additional mounts are configured
+    "mounts": [
+      ]
 }

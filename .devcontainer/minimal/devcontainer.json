@@ -25,12 +25,8 @@
       // }
     },
   
-    // Mount isolation configuration for security and development workflow
-    // If you need to extract something from within the container, you can use docker cp, but use it at your own risk. 
-    // If you want to develop your devcontainer, you should comment this things, otherwise your changes inside the live container won't persist.
-    // Disables mounting the host workspace into the container for isolation.
-    "workspaceMount": "type=tmpfs,destination=/workspace",
-    // Sets a workspace path entirely isolated within the container
+    // Mount copying host folder into container, no isolation.
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
     "workspaceFolder": "/workspace",
     
     // Docker run arguments for security hardening and resource management

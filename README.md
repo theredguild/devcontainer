@@ -1,57 +1,91 @@
-# The Red Guild's devcontainer exploration
+# The Red Guild's devcontainer explorations
 
-This container is always a work in progress. Feel free to suggest improvements or requirements as
+This repo is always a work in progress. Feel free to suggest improvements or requirements as
 well. Check out similar projects like **@Deivitto**'s auditor-docker and **@trailofbit's**
 eth-security-toolbox.
 
-The most important thing about this devcontainer, is that we always try to find the best way to
-install the most popular tools, so they can all work seamlessly, and at the same time add security
-by default. If you want to know more, and really want to take advante of this devcontainer read
+The most important thing about these devcontainers is that we always try to find the best way to
+install the most popular tools, so they can all work seamlessly, and at the same time, add security
+by default. If you want to know more and really want to take advantage of these devcontainers, read
 below.
+
+## Quickstart with Devcontainer Wizard
+
+You can use any prebuilt container using our [Devcontainer Wizard](https://github.com/theredguild/devcontainer-wizard):
+
+![Simple wizard Example](./assets/wizard.gif)
+
+## Quickstart with Github Codespaces
+
+You can also run prebuilt containers using GitHub Codespaces: 
+
+[![Open in Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&template_repository=theredguild/devcontainer)
 
 ## Available Devcontainer Variants
 
 We now offer multiple devcontainer configurations to suit different security and development needs:
 
-### **Isolated** (`.devcontainer/isolated/`)
-**Best for**: Maximum security isolation, air-gapped environments
-- **Focus**: Complete isolation with read-only filesystem and network isolation
-- **Includes**: All security tools, fuzzing tools (Echidna, Medusa), static analysis
-- **Security**: Read-only filesystem, network isolation, capability dropping, tmpfs mounts
-- **Extensions**: Comprehensive Ethereum security bundle, audit tools, decompilers
-- **Use case**: High-security research and isolated analysis
+### **Air-gapped** (`.devcontainer/airgapped/`)
+ High-security development with complete network isolation. Perfect for analyzing malicious smart contracts, handling sensitive private keys, or working with classified projects that require zero external connectivity.
 
-### **Hardened** (`.devcontainer/hardened/`)
-**Best for**: Enhanced security with development flexibility
-- **Focus**: Security hardening with maintained network connectivity
-- **Includes**: Core security tools, Foundry, Hardhat, reduced tool set for security focus
-- **Security**: Capability dropping, security options, resource limits, DNS hardening
-- **Extensions**: Essential security extensions, development tools
-- **Use case**: Secure development, security-focused research, balanced security/functionality
+- **Focus**: Isolated workspace using tmpfs; secure defaults while keeping connectivity
+- **Includes**: Git, GitHub CLI; security tools available via Dockerfile
+- **Security**: Capability dropping, AppArmor, no-new-privileges, multiple tmpfs mounts; not read-only
+- **Network**: Uses bridge networking (no network isolation by default)
+- **Extensions**: None configured by default (because it fails with `network-none`)
+
+### **Isolated** (`.devcontainer/isolated/`)
+**Use case**: Execute untrusted code. Example: job interview.
+
+- **Focus**: Security hardening with maintained network connectivity and security extensions
+- **Includes**: Security tools, Foundry, Hardhat, audit tools via Dockerfile
+- **Security**: Capability dropping, AppArmor, no-new-privileges, tmpfs workspace isolation
+- **Network**: Uses bridge networking (no network isolation by default)
+- **Extensions**: Comprehensive security extensions (Ethereum Security Bundle, Trail of Bits tools)
 
 ### **Auditor** (`.devcontainer/auditor/`)
-**Best for**: Smart contract auditors and security researchers
-- **Focus**: Specialized audit tooling and Docker-in-Docker support
+**Use case**: Do smart contract audits, security analysis, research workflows.
+
+- **Focus**: Specialized audit tooling with Docker-in-Docker support
 - **Includes**: Slither, Mythril, Crytic-compile, Foundry, Hardhat, Echidna
+- **Workspace**: Host workspace bind-mounted into `/workspace` (no isolation)
 - **Features**: Docker-in-Docker, specialized audit extensions, focused toolchain
 - **Extensions**: Solidity visual auditor, metrics, audit tools, GitLens
-- **Use case**: Comprehensive smart contract audits, security analysis, research workflows
 
 ### **Minimal** (`.devcontainer/minimal/`)
-**Best for**: Essential development with basic security
+**Use case**: Use Hardhat and Foundry without setup. Basic development, resource-constrained environments.
+
 - **Focus**: Core tools only, streamlined development environment
 - **Includes**: Foundry, Hardhat, basic Solidity support, essential Python tools
 - **Security**: Basic hardening, capability dropping, IPv6 disabled
+- **Workspace**: Host workspace bind-mounted into `/workspace` (no isolation)
 - **Extensions**: Core development extensions only
-- **Use case**: Quick prototyping, learning, basic development, resource-constrained environments
+
+### **ETH Security Toolbox** (`.devcontainer/eth-security-toolbox/`)
+**Use case**: Audit smart contracts using all the tools selected by Trail of Bits.
+
+- **Focus**: All the tools in the ETH Security Toolbox.
+- **Includes**: All the tools in the ETH Security Toolbox.
+- **Workspace**: Host workspace bind-mounted into `/workspace` (no isolation)
+- **Extensions**: All the tools in the ETH Security Toolbox.
+
+### **(EXPERIMENTAL) Paranoid** (`.devcontainer/paranoid/`)
+**Use case**: Maximum security isolation with read-only filesystem and ephemeral workspace. Designed for the most security-conscious developers who need to analyze potentially malicious code or work with highly sensitive data. 
+
+- **Focus**: Strong isolation with read-only filesystem and ephemeral workspace
+- **Includes**: Git, GitHub CLI; minimal by default
+- **Security**: Read-only filesystem, capability dropping, extensive tmpfs mounts for VS Code and caches
+- **Network**: No explicit network isolation by default (can be enabled via `--network=none`)
+- **Extensions**: None configured by default
 
 ### **Legacy** (`.devcontainer/legacy/`)
-**Best for**: Complete toolchain with all features (original experience)
+**Use case**: Comprehensive development, learning, full-stack projects, research
+
 - **Focus**: Full-featured development environment with comprehensive security tools
 - **Includes**: Complete tool suite, all security tools, fuzzing tools, analysis tools
-- **Security**: Comprehensive hardening, isolation features, security options
+- **Security**: Comprehensive hardening; workspace isolated via tmpfs
+- **Workspace**: Isolated workspace (tmpfs mount, not host-bound)
 - **Extensions**: Full extension suite, all security and development tools
-- **Use case**: Comprehensive development, learning, full-stack projects, research
 
 ## Project Structure
 
@@ -60,7 +94,7 @@ The project supports multiple devcontainer configurations for different use case
 ```
 .devcontainer/
 ├── isolated/          # Maximum security isolation
-├── hardened/          # Enhanced security with flexibility
+├── airgapped/         # Enhanced security with flexibility
 ├── auditor/           # Specialized audit environment
 ├── minimal/           # Essential tools only
 └── legacy/            # Complete toolchain (original)

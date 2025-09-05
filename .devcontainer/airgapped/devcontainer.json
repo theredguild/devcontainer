@@ -3,7 +3,7 @@
   // This is the HARDENED version of TRG's DevContainer - provides enhanced security
   // with capability dropping, security options, and resource limits while maintaining
   // network connectivity for development.
-  "name": "Hardened TRG's DevContainer",
+  "name": "Air-gapped TRG's DevContainer",
   
   // Build configuration - uses the local Dockerfile in this directory
   "build": {
@@ -23,23 +23,13 @@
   // Container environment variables
   "containerEnv": {
     "SHELL": "/bin/zsh",  // Use zsh as the default shell
-    "DEVCONTAINER_ID_LABEL": "hardened-web3-devcontainer"  // Label for container identification
+    "DEVCONTAINER_ID_LABEL": "airgapped-web3-devcontainer"  // Label for container identification
   },
   
   // Configure tool-specific properties for VS Code
   "customizations": {
     "vscode": {
       // Web3 security and development extensions
-      "extensions": [
-        "tintinweb.ethereum-security-bundle",  // Comprehensive Ethereum security tools
-        "tintinweb.vscode-ethover",           // Ethereum hover information
-        "trailofbits.weaudit",                // Trail of Bits audit tools
-        "tintinweb.vscode-inline-bookmarks",  // Inline code bookmarks
-        "tintinweb.vscode-solidity-language", // Solidity language support
-        "tintinweb.graphviz-interactive-preview", // Graph visualization
-        "trailofbits.contract-explorer",      // Smart contract exploration
-        "tintinweb.vscode-decompiler"        // Contract decompilation
-      ],
       // VS Code settings for security and functionality
       "settings": {
           // Security settings - killswitch for automated tasks
@@ -69,7 +59,7 @@
     // If you need to extract something from within the container, you can use docker cp, but use it at your own risk. 
     // If you want to develop your devcontainer, you should comment this things, otherwise your changes inside the live container won't persist.
     // Disables mounting the host workspace into the container for isolation.
-    "workspaceMount": "type=tmpfs,destination=/workspace",
+    "workspaceMount": "type=tmpfs,destination=/workspace,tmpfs-mode=1777",
     // Sets a workspace path entirely isolated within the container
     "workspaceFolder": "/workspace",
     
@@ -98,15 +88,7 @@
       // Network security configuration
       // If you really want to isolate it, just disconnect it from the internet. 
       // You should COPY your working files inside before, otherwise you'll have to mount them manually.
-      // "--network=none",
-      
-      // IPv6 security - disable IPv6 to reduce attack surface
-      "--sysctl=net.ipv6.conf.all.disable_ipv6=1",    // Disable IPv6 globally
-      "--sysctl=net.ipv6.conf.default.disable_ipv6=1", // Disable IPv6 by default
-      
-      // Network capability restrictions
-      "--cap-drop=NET_RAW",                            // Disable raw packet access
-      "--network=bridge",                              // Use bridge networking
+      "--network=none",
       
       // DNS configuration for security and reliability
       "--dns=1.1.1.1",                                // Primary DNS (Cloudflare)

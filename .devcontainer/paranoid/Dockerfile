@@ -1,16 +1,14 @@
 # syntax=docker/dockerfile:1.8
 # check=error=true
 # 
-# HARDENED TRG DevContainer Dockerfile
-# This Dockerfile creates a security-hardened development environment for Web3 security research
-# with enhanced security features, capability dropping, and minimal attack surface.
+# ISOLATED TRG DevContainer Dockerfile
+# This Dockerfile creates a highly isolated development environment for Web3 security research
+# with maximum security isolation, read-only filesystem, and network isolation.
 # 
 # Key security features:
-# - Multi-stage build for Echidna binary
 # - Non-root user execution
 # - Minimal package installation
 # - Security-hardened toolchain
-# - Reduced tool set for security focus
 
 ## Multi-stage build for Echidna
 # Pull latest prebuilt Echidna binary from Crytic's official image
@@ -19,7 +17,7 @@ FROM --platform=linux/amd64 ghcr.io/crytic/echidna/echidna:latest AS echidna
 
 # Base image: Latest Debian with VS Code DevContainer support
 # This provides a stable, security-focused base for development
-FROM mcr.microsoft.com/devcontainers/base:bookworm
+FROM mcr.microsoft.com/vscode/devcontainers/base:debian
 
 # Install essential system packages for development
 # These are the minimal packages needed for Web3 development tools
@@ -37,8 +35,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     zsh                   # Advanced shell \
     && rm -rf /var/lib/apt/lists/*
 
-
-    
 # Install Python development dependencies
 # Required for Python-based security tools and package management
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -104,6 +100,17 @@ USER vscode
 ENV PNPM_HOME=${HOME}/.local/share/pnpm
 ENV PATH=${PATH}:${PNPM_HOME}
 
+# Install Python-based security analysis tools (reduced set for security focus)
+# These tools provide essential smart contract security analysis
+# Focused on core tools: slither, mythril, crytic-compile, halmos, solc-select
+RUN uv tool install slither-analyzer && \ 
+    uv tool install crytic-compile && \ 
+    uv tool install slither-lsp && \ 
+    uv tool install mythril && \ 
+    uv tool install halmos && \ 
+    uv tool install solc-select && \
+    solc-select install 0.4.26 0.5.17 0.6.12 0.7.6 0.8.10 latest && solc-select use latest
+
 # Install Foundry framework for Ethereum development
 # Foundry provides Forge (testing), Cast (interaction), and Anvil (local blockchain)
 RUN curl -fsSL https://foundry.paradigm.xyz | zsh && \
@@ -127,17 +134,6 @@ RUN git clone https://github.com/crytic/medusa $HOME/medusa && \
 # Return to home directory and clean up build artifacts
 WORKDIR $HOME
 RUN rm -rf medusa/
-
-# Install Python-based security analysis tools (reduced set for security focus)
-# These tools provide essential smart contract security analysis
-# Focused on core tools: slither, mythril, crytic-compile, halmos, solc-select
-RUN uv tool install slither-analyzer && \ 
-    uv tool install crytic-compile && \ 
-    uv tool install slither-lsp && \ 
-    uv tool install mythril && \ 
-    uv tool install halmos && \ 
-    uv tool install solc-select && \
-    solc-select install 0.4.26 0.5.17 0.6.12 0.7.6 0.8.10 latest && solc-select use latest
 
 # Copy Echidna binary from echidna stage to final image
 # This provides the prebuilt Echidna tool without rebuilding
