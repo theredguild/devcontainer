@@ -1,0 +1,41 @@
+{
+    // For format details, see https://aka.ms/devcontainer.json.
+    // This is a Dev Container for Github Codespaces based on eth-security-toolbox image created by Trail of Bits
+    // check https://github.com/trailofbits/eth-security-toolbox for more information.
+    "name": "codespaces",
+    
+    // Build configuration - uses the eth-security-toolbox image
+    "image": "ghcr.io/trailofbits/eth-security-toolbox:nightly",
+    // Configure tool-specific properties for VS Code
+    "customizations": {
+        "vscode": {
+            // Specialized extensions for smart contract auditing and development
+            "extensions": [ 
+                // check out https://marketplace.visualstudio.com/items?itemName=tintinweb.ethereum-security-bundle for more information
+                "tintinweb.ethereum-security-bundle", // includes what is listed above ^
+                "tintinweb.vscode-ethover",
+                "trailofbits.weaudit",
+                "trailofbits.contract-explorer",
+                "trailofbits.sarif-explorer"
+            ],
+            // VS Code settings optimized for auditing workflows
+            "settings": {
+                    // Security settings - killswitch for automated tasks
+                    "task.autoDetect": "off",                    // Disable automatic task detection
+                    "task.problemMatchers.autoDetect": "off",    // Disable automatic problem matchers
+                    
+                    // Trust and security configuration
+                    "security.workspace.trust.enabled": false,   // Trust no one by default
+                    
+                    // Privacy settings - killswitch for telemetry
+                    "telemetry.telemetryLevel": "off",           // Disable all telemetry collection
+                    
+                    // Terminal configuration
+                    "terminal.integrated.defaultProfile.linux": "bash"
+            }
+        }
+    },
+    
+    // Sets a workspace path entirely hardened within the container
+    "workspaceFolder": "/workspace"
+}

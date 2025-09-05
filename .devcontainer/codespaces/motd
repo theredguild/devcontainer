@@ -1,0 +1,29 @@
+
+┌──        ┌──┐      ──┬──
+├─         └──┐        │
+└──THEREUM─┴──┴ECURITY─┴OOLBOX
+
+https://github.com/trailofbits/eth-security-toolbox
+
+by   ################
+    ##########TRAIL#
+         ####       
+        ####    ###########
+       ####    ###########
+      \###    ####     ####
+     /\\# of ####     ####
+    /  \    ############ 
+    \__/   ####      ####
+          \###      ####
+         /\\#########
+        /__\\##BITS#
+
+Security Tools and Resources Installed:
+
+https://github.com/crytic/echidna
+https://github.com/crytic/medusa
+https://github.com/crytic/slither
+https://github.com/crytic/building-secure-contracts
+
+Use `solc-select` to switch between different versions of `solc`
+
