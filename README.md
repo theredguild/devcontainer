@@ -26,16 +26,16 @@ You can also run prebuilt containers using GitHub Codespaces:
 We now offer multiple devcontainer configurations to suit different security and development needs:
 
 ### **Air-gapped** (`.devcontainer/airgapped/`)
- High-security development with complete network isolation. Perfect for analyzing malicious smart contracts, handling sensitive private keys, or working with classified projects that require zero external connectivity.
+ Complete network isolation.
 
-- **Focus**: Isolated workspace using tmpfs; secure defaults while keeping connectivity
+- **Focus**: Isolated workspace using tmpfs without network.
 - **Includes**: Git, GitHub CLI; security tools available via Dockerfile
 - **Security**: Capability dropping, AppArmor, no-new-privileges, multiple tmpfs mounts; not read-only
 - **Network**: Uses bridge networking (no network isolation by default)
 - **Extensions**: None configured by default (because it fails with `network-none`)
 
 ### **Isolated** (`.devcontainer/isolated/`)
-**Use case**: Execute untrusted code. Example: job interview.
+**Use case**: Use an isolated workspace without copying your environment.
 
 - **Focus**: Security hardening with maintained network connectivity and security extensions
 - **Includes**: Security tools, Foundry, Hardhat, audit tools via Dockerfile
@@ -70,7 +70,7 @@ We now offer multiple devcontainer configurations to suit different security and
 - **Extensions**: All the tools in the ETH Security Toolbox.
 
 ### **(EXPERIMENTAL) Paranoid** (`.devcontainer/paranoid/`)
-**Use case**: Maximum security isolation with read-only filesystem and ephemeral workspace. Designed for the most security-conscious developers who need to analyze potentially malicious code or work with highly sensitive data. 
+**Use case**: Maximum security isolation with read-only filesystem and ephemeral workspace.
 
 - **Focus**: Strong isolation with read-only filesystem and ephemeral workspace
 - **Includes**: Git, GitHub CLI; minimal by default
