@@ -36,9 +36,9 @@
         }
     },
     
-    // Mount copying host folder into container, no isolation.
+    // Mount copying host folder into container, no hardening.
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-    // Sets a workspace path entirely isolated within the container
+    // Sets a workspace path entirely hardened within the container
     "workspaceFolder": "/workspace",
     
     // Docker run arguments for security hardening and resource management
@@ -48,7 +48,7 @@
       // "--read-only",
       
       // Temporary filesystem mounts with security restrictions
-      // These provide isolated, size-limited temporary storage
+      // These provide hardened, size-limited temporary storage
       "--tmpfs=/tmp:rw,noexec,nosuid,size=512m",      // Main temporary directory
       "--tmpfs=/var/tmp:rw,noexec,nosuid,size=512m",  // System temporary directory
       "--tmpfs=/dev/shm:rw,noexec,nosuid,size=64m",   // Shared memory directory
@@ -57,7 +57,7 @@
       // This reduces the attack surface by removing unnecessary privileges
       "--cap-drop=ALL",
   
-      // Security options for container isolation
+      // Security options for container hardening
       // A few security additions (AppArmor & no new privileges)
       "--security-opt", "no-new-privileges",           // Prevent privilege escalation
       "--security-opt", "apparmor:docker-default",     // Use Docker's default AppArmor profile

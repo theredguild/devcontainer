@@ -55,19 +55,19 @@
   "postStartCommand": "echo '🚀 Dev container is ready for Web3 development!'",
   
 
-    // Mount isolation configuration for security and development workflow
+    // Mount hardening configuration for security and development workflow
     // If you need to extract something from within the container, you can use docker cp, but use it at your own risk. 
     // If you want to develop your devcontainer, you should comment this things, otherwise your changes inside the live container won't persist.
-    // Disables mounting the host workspace into the container for isolation.
+    // Disables mounting the host workspace into the container for hardening.
     "workspaceMount": "type=tmpfs,destination=/workspace,tmpfs-mode=1777",
-    // Sets a workspace path entirely isolated within the container
+    // Sets a hardened workspace
     "workspaceFolder": "/workspace",
     
     // Docker run arguments for security hardening and resource management
     "runArgs": [
 
       // Temporary filesystem mounts with security restrictions
-      // These provide isolated, size-limited temporary storage
+      // These provide size-limited temporary storage
       "--tmpfs=/tmp:rw,noexec,nosuid,size=512m",      // Main temporary directory
       "--tmpfs=/var/tmp:rw,noexec,nosuid,size=512m",  // System temporary directory
       "--tmpfs=/dev/shm:rw,noexec,nosuid,size=64m",   // Shared memory directory
@@ -76,7 +76,7 @@
       // This reduces the attack surface by removing unnecessary privileges
       "--cap-drop=ALL",
   
-      // Security options for container isolation
+      // Security options for container hardening
       // A few security additions (AppArmor & no new privileges)
       "--security-opt", "no-new-privileges",           // Prevent privilege escalation
       "--security-opt", "apparmor:docker-default",     // Use Docker's default AppArmor profile
