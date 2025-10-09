@@ -61,7 +61,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Update PATH environment for tool access
 # Configure paths for Python, Node.js, and other tools
-ENV UV_LOCAL_BIN=$HOME/.cargo/bin
+ENV UV_LOCAL_BIN=$HOME/.local/bin
 ENV USR_LOCAL_BIN=/usr/local/bin
 ENV LOCAL_BIN=${HOME}/.local/bin
 ENV PNPM_HOME=${HOME}/.local/share/pnpm
@@ -114,6 +114,7 @@ RUN foundryup
 # Focused on core auditing tools: slither, mythril, crytic-compile
 RUN uv tool install slither-analyzer && \
     uv tool install mythril && \
+    uv tool install slither-lsp && \
     uv tool install crytic-compile 
 
 # Install Hardhat and Solhint for Ethereum development
