@@ -110,6 +110,8 @@ The project supports multiple devcontainer configurations for different use case
 .devcontainer/
 ├── hardened/          # Hardened
 ├── airgapped/         # Enhanced security with flexibility
+├── eth-security-toolbox/ # Based on Trail of Bits's dockerfile
+├── codespaces         # GitHub Codespaces Variant
 ├── auditor/           # Specialized audit environment
 ├── minimal/           # Essential tools only
 └── legacy/            # Complete toolchain (original)
@@ -118,7 +120,7 @@ The project supports multiple devcontainer configurations for different use case
 ## Quick Start
 
 1. **Choose your variant** based on your needs (see above)
-2. **Navigate to the variant directory**: `cd .devcontainer/[variant-name]`
+2. **Navigate to the devcontainer directory**: `cd .devcontainer`
 3. **Open in VS Code**: `code .`
 4. **Reopen in Container**: Select the appropriate devcontainer when prompted
 

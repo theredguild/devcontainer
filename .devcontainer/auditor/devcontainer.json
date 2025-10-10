@@ -35,7 +35,7 @@
                 "tintinweb.graphviz-interactive-preview",
                 "NomicFoundation.hardhat-solidity",
                 "Olympixai.olympix",
-                "trailofbits.contract-explorer",
+                "trailofbits.slither-vscode",
                 "tintinweb.chonky"                            // Chonky Agent
             ],
             // VS Code settings optimized for auditing workflows
